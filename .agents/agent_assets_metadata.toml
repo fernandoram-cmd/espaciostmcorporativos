@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "j3DkVzBts7paqwP8DQ3Ai"
+uri = "file://artifacts/login-page/src/assets/stadium-concert.png"
+type = "image"
+title = "concert stadium night"
+
+[[generated]]
+id = "w9sGGtAQuRwjV6v1OFDwP"
+uri = "file://artifacts/login-page/src/assets/dome-arena.png"
+type = "image"
+title = "dome arena exterior"
