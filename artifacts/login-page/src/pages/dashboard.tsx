@@ -1,13 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { ShoppingCart, User, Menu } from "lucide-react";
 import { useAuth } from "@/context/auth";
+import MenuDrawer from "@/components/MenuDrawer";
 import stadiumConcert from "@/assets/stadium-concert.png";
 import domeArena from "@/assets/dome-arena.png";
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
   const [, setLocation] = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -18,6 +20,7 @@ export default function DashboardPage() {
   if (!user) return null;
 
   const firstName = user.name.split(" ")[0];
+  const initial = firstName.charAt(0).toUpperCase();
 
   const handleLogout = () => {
     logout();
@@ -26,11 +29,12 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="bg-black flex items-center justify-between px-4 py-3 sticky top-0 z-50">
+      <header className="bg-black flex items-center justify-between px-4 py-3 sticky top-0 z-40">
         <button
           data-testid="button-menu"
           className="text-white hover:text-gray-300 transition-colors"
           aria-label="Menú"
+          onClick={() => setMenuOpen(true)}
         >
           <Menu size={26} strokeWidth={2} />
         </button>
@@ -63,6 +67,14 @@ export default function DashboardPage() {
           </button>
         </div>
       </header>
+
+      <MenuDrawer
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        userInitial={initial}
+        userName={firstName}
+        onLogout={handleLogout}
+      />
 
       <section className="relative w-full overflow-hidden">
         <img
