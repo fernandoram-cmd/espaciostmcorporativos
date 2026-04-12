@@ -26,10 +26,10 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="bg-white flex items-center justify-between px-4 py-3 sticky top-0 z-50 border-b border-gray-100">
+      <header className="bg-black flex items-center justify-between px-4 py-3 sticky top-0 z-50">
         <button
           data-testid="button-menu"
-          className="text-black hover:text-gray-600 transition-colors"
+          className="text-white hover:text-gray-300 transition-colors"
           aria-label="Menú"
         >
           <Menu size={26} strokeWidth={2} />
@@ -37,7 +37,7 @@ export default function DashboardPage() {
 
         <div className="absolute left-1/2 -translate-x-1/2">
           <span
-            className="font-black text-xl uppercase select-none"
+            className="font-black text-xl uppercase select-none text-white"
             style={{ fontFamily: "'Arial Black', 'Impact', sans-serif", letterSpacing: "0.14em" }}
           >
             OCESA
@@ -48,7 +48,7 @@ export default function DashboardPage() {
           <button
             onClick={handleLogout}
             data-testid="button-account"
-            className="text-black hover:text-gray-600 transition-colors"
+            className="text-white hover:text-gray-300 transition-colors"
             title={`Cerrar sesión (${firstName})`}
             aria-label="Cuenta"
           >
@@ -56,7 +56,7 @@ export default function DashboardPage() {
           </button>
           <button
             data-testid="button-cart"
-            className="text-black hover:text-gray-600 transition-colors"
+            className="text-white hover:text-gray-300 transition-colors"
             aria-label="Carrito"
           >
             <ShoppingCart size={24} strokeWidth={1.5} />
