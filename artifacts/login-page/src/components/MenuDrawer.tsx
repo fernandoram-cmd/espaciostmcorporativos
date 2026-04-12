@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ShoppingCart, User, ChevronDown, Globe, X } from "lucide-react";
+import { useLocation } from "wouter";
+import { ShoppingCart, ChevronDown, Globe, X } from "lucide-react";
 
 interface MenuDrawerProps {
   open: boolean;
@@ -12,6 +13,12 @@ interface MenuDrawerProps {
 export default function MenuDrawer({ open, onClose, userInitial, userName, onLogout }: MenuDrawerProps) {
   const [espaciosOpen, setEspaciosOpen] = useState(true);
   const [idiomaOpen, setIdiomaOpen] = useState(false);
+  const [, setLocation] = useLocation();
+
+  const navigate = (path: string) => {
+    onClose();
+    setLocation(path);
+  };
 
   if (!open) return null;
 
@@ -64,7 +71,7 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
             <button
               className="w-full text-left py-5 text-xl text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
               data-testid="menu-item-eventos"
-              onClick={onClose}
+              onClick={() => navigate("/eventos")}
             >
               Mis eventos
             </button>
