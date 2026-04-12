@@ -34,7 +34,7 @@ export default function LoginPage() {
     const result = await login(email, password);
     setLoading(false);
     if (result.success) {
-      setLocation("/dashboard");
+      setLocation("/eventos");
     } else {
       setError(result.error ?? "Error al iniciar sesión.");
     }
@@ -59,7 +59,7 @@ export default function LoginPage() {
     const result = await register(email, password, name.trim());
     setLoading(false);
     if (result.success) {
-      setLocation("/dashboard");
+      setLocation("/eventos");
     } else {
       setError(result.error ?? "Error al crear la cuenta.");
     }
