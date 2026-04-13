@@ -93,22 +93,28 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
             {espaciosOpen && (
               <ul className="bg-black">
                 <li>
-                  <button
-                    className="w-full text-left py-5 pl-2 text-xl text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
+                  <a
+                    href="https://www.estadiognpseguros.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-left py-5 pl-2 text-xl text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
                     data-testid="menu-item-estadio-gnp"
                     onClick={onClose}
                   >
                     Estadio GNP Seguros
-                  </button>
+                  </a>
                 </li>
                 <li>
-                  <button
-                    className="w-full text-left py-5 pl-2 text-xl text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
+                  <a
+                    href="https://www.palaciodelosdeportes.mx/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-left py-5 pl-2 text-xl text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
                     data-testid="menu-item-palacio"
                     onClick={onClose}
                   >
                     Palacio de los Deportes
-                  </button>
+                  </a>
                 </li>
               </ul>
             )}
