@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { ShoppingCart, User, Menu } from "lucide-react";
 import { useAuth } from "@/context/auth";
+import AppHeader from "@/components/AppHeader";
 import MenuDrawer from "@/components/MenuDrawer";
 import stadiumConcert from "@/assets/stadium-concert.png";
 import domeArena from "@/assets/dome-arena.png";
@@ -29,44 +29,12 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="bg-black flex items-center justify-between px-4 py-3 sticky top-0 z-40">
-        <button
-          data-testid="button-menu"
-          className="text-white hover:text-gray-300 transition-colors"
-          aria-label="Menú"
-          onClick={() => setMenuOpen(true)}
-        >
-          <Menu size={26} strokeWidth={2} />
-        </button>
-
-        <div className="absolute left-1/2 -translate-x-1/2">
-          <span
-            className="font-black text-xl uppercase select-none text-white"
-            style={{ fontFamily: "'Arial Black', 'Impact', sans-serif", letterSpacing: "0.14em" }}
-          >
-            OCESA
-          </span>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handleLogout}
-            data-testid="button-account"
-            className="text-white hover:text-gray-300 transition-colors"
-            title={`Cerrar sesión (${firstName})`}
-            aria-label="Cuenta"
-          >
-            <User size={24} strokeWidth={1.5} />
-          </button>
-          <button
-            data-testid="button-cart"
-            className="text-white hover:text-gray-300 transition-colors"
-            aria-label="Carrito"
-          >
-            <ShoppingCart size={24} strokeWidth={1.5} />
-          </button>
-        </div>
-      </header>
+      <AppHeader
+        userInitial={initial}
+        userName={firstName}
+        onMenuOpen={() => setMenuOpen(true)}
+        onLogout={handleLogout}
+      />
 
       <MenuDrawer
         open={menuOpen}
@@ -87,7 +55,7 @@ export default function DashboardPage() {
         <div className="absolute inset-0 flex flex-col justify-center px-4" style={{ gap: "2px" }}>
           <div>
             <span
-              className="text-white text-xl font-normal leading-tight"
+              className="text-white text-xl font-normal"
               style={{
                 backgroundColor: "rgba(0,0,0,0.85)",
                 boxDecorationBreak: "clone",
@@ -102,7 +70,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <span
-              className="text-white text-xl font-normal leading-tight"
+              className="text-white text-xl font-normal"
               style={{
                 backgroundColor: "rgba(0,0,0,0.85)",
                 boxDecorationBreak: "clone",
