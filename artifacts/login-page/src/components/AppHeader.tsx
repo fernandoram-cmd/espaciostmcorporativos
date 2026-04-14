@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { ShoppingCart } from "lucide-react";
 
@@ -10,6 +11,25 @@ interface AppHeaderProps {
 
 export default function AppHeader({ userInitial, userName, onMenuOpen, onLogout }: AppHeaderProps) {
   const [, setLocation] = useLocation();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownOpen]);
+
+  const navigate = (path: string) => {
+    setDropdownOpen(false);
+    setLocation(path);
+  };
 
   return (
     <header className="bg-black flex items-center justify-between px-4 py-3 sticky top-0 z-40">
@@ -45,17 +65,46 @@ export default function AppHeader({ userInitial, userName, onMenuOpen, onLogout 
       </button>
 
       <div className="flex items-center gap-4">
-        <button
-          onClick={onLogout}
-          data-testid="button-account"
-          className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm hover:bg-blue-600 transition-colors"
-          title={`Cerrar sesión (${userName})`}
-          aria-label="Cuenta"
-        >
-          {userInitial}
-        </button>
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            data-testid="button-account"
+            className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm hover:bg-blue-600 transition-colors"
+            aria-label="Cuenta"
+          >
+            {userInitial}
+          </button>
+
+          {dropdownOpen && (
+            <div className="absolute right-0 top-12 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-fade-in">
+              <button
+                onClick={() => navigate("/perfil")}
+                className="w-full text-left px-6 py-5 text-lg text-black font-medium hover:bg-gray-50 transition-colors border-b border-gray-100"
+                data-testid="dropdown-mi-perfil"
+              >
+                Mi perfil
+              </button>
+              <button
+                onClick={() => navigate("/actividad")}
+                className="w-full text-left px-6 py-5 text-lg text-black font-medium hover:bg-gray-50 transition-colors border-b border-gray-100"
+                data-testid="dropdown-actividad"
+              >
+                Actividad de la cuenta
+              </button>
+              <button
+                onClick={() => { setDropdownOpen(false); onLogout(); }}
+                className="w-full text-left px-6 py-5 text-lg text-black font-medium hover:bg-gray-50 transition-colors"
+                data-testid="dropdown-desconectar"
+              >
+                Desconectar
+              </button>
+            </div>
+          )}
+        </div>
+
         <button
           data-testid="button-cart"
+          onClick={() => setLocation("/carrito")}
           className="text-white hover:text-gray-300 transition-colors"
           aria-label="Carrito"
         >
