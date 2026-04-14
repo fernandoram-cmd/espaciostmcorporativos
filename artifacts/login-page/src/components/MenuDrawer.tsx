@@ -192,18 +192,24 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
         </div>
 
         <div className="px-6 py-6 space-y-4">
-          <button
+          <a
+            href="https://privacy.ticketmaster.com.mx/es/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
             className="block text-sm text-gray-400 hover:text-white transition-colors text-left"
             data-testid="menu-link-privacidad"
           >
             Ticketmaster aviso de privacidad
-          </button>
-          <button
+          </a>
+          <a
+            href="https://am.ticketmaster.com/espacioscorporativos/en/terms"
+            target="_blank"
+            rel="noopener noreferrer"
             className="block text-sm text-gray-400 hover:text-white transition-colors text-left"
             data-testid="menu-link-condiciones"
           >
             Términos de uso
-          </button>
+          </a>
         </div>
 
         <div className="px-6 pb-8">
