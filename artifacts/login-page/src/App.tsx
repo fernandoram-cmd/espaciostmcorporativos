@@ -6,6 +6,8 @@ import { AuthProvider } from "@/context/auth";
 import LoginPage from "@/pages/login";
 import DashboardPage from "@/pages/dashboard";
 import EventosPage from "@/pages/eventos";
+import GnpPremiumPage from "@/pages/gnp-premium";
+import BoxesPage from "@/pages/boxes";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -16,6 +18,8 @@ function Router() {
       <Route path="/" component={LoginPage} />
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/eventos" component={EventosPage} />
+      <Route path="/gnp-premium" component={GnpPremiumPage} />
+      <Route path="/boxes" component={BoxesPage} />
       <Route component={NotFound} />
     </Switch>
   );

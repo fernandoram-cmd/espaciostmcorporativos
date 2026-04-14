@@ -88,7 +88,7 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
                   <button
                     className="block w-full text-left py-4 pl-4 text-lg text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
                     data-testid="menu-item-gnp-premium"
-                    onClick={onClose}
+                    onClick={() => navigate("/gnp-premium")}
                   >
                     GNP Premium Pass
                   </button>
@@ -108,7 +108,7 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
                   <button
                     className="block w-full text-left py-4 pl-4 text-lg text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
                     data-testid="menu-item-boxes"
-                    onClick={onClose}
+                    onClick={() => navigate("/boxes")}
                   >
                     Boxes
                   </button>
