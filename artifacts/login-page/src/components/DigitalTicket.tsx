@@ -157,15 +157,15 @@ export default function DigitalTicket({ userName }: { userName: string }) {
         </span>
       </div>
 
-      <div className="px-5 pt-6 pb-0">
+      <div className="px-5 pt-8 pb-0">
         <p
-          className="text-xs text-gray-500 font-semibold uppercase tracking-widest text-center mb-1"
+          className="text-xs text-gray-500 font-semibold uppercase tracking-widest text-center mb-2"
           style={{ letterSpacing: "0.08em" }}
         >
           BTS WORLD TOUR &lsquo;ARIRANG&rsquo; IN MEXICO CITY
         </p>
 
-        <div className="flex items-center justify-between mb-5 mt-3">
+        <div className="flex items-center justify-between mb-7 mt-4">
           <h2 className="text-xl font-bold text-gray-900">Boxes Oro</h2>
           <div className="relative">
             <button
@@ -184,37 +184,37 @@ export default function DigitalTicket({ userName }: { userName: string }) {
           </div>
         </div>
 
-        <div className="flex justify-between mb-8">
+        <div className="flex justify-between mb-12">
           <div>
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
               Sección
             </p>
             <p className="text-2xl font-black text-gray-900 leading-none">Box Oro</p>
           </div>
           <div className="text-center">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
               Fila
             </p>
             <p className="text-2xl font-black text-gray-900 leading-none">6</p>
           </div>
           <div className="text-right">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
               Asiento(s)
             </p>
             <p className="text-2xl font-black text-gray-900 leading-none">4</p>
           </div>
         </div>
 
-        <div className="mb-0">
+        <div className="mb-0 px-4">
           <SafetixBarcode code={barcodeCode} />
         </div>
 
-        <p className="text-center text-sm text-gray-600 leading-snug mb-8 mt-4">
+        <p className="text-center text-sm text-gray-600 leading-snug mb-12 mt-6">
           No podrás entrar con capturas de pantalla.
         </p>
       </div>
 
-      <div className="bg-black mx-0 py-5 flex items-center justify-center">
+      <div className="bg-black mx-0 py-6 flex items-center justify-center">
         <p className="text-white text-xl font-black uppercase tracking-[0.2em]">
           Acceso F
         </p>
