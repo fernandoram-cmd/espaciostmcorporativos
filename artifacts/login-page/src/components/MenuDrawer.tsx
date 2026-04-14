@@ -10,9 +10,11 @@ interface MenuDrawerProps {
   onLogout: () => void;
 }
 
+const reglamentoPdfUrl = `${import.meta.env.BASE_URL}reglamento-gnp-premium-pass.pdf`;
+
 export default function MenuDrawer({ open, onClose, userInitial, userName, onLogout }: MenuDrawerProps) {
   const [espaciosOpen, setEspaciosOpen] = useState(true);
-  const [idiomaOpen, setIdiomaOpen] = useState(false);
+  const [idiomaOpen, setIdiomaOpen] = useState(true);
   const [, setLocation] = useLocation();
 
   const navigate = (path: string) => {
@@ -65,18 +67,8 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
         </div>
       </header>
 
-      <nav className="flex-1 px-6 pt-6 pb-4">
+      <nav className="flex-1 px-6 pt-2 pb-4">
         <ul className="space-y-0">
-          <li>
-            <button
-              className="w-full text-left py-5 text-xl text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
-              data-testid="menu-item-eventos"
-              onClick={() => navigate("/eventos")}
-            >
-              Mis eventos
-            </button>
-          </li>
-
           <li>
             <button
               className="w-full text-left py-5 text-xl text-white border-b border-gray-800 flex items-center justify-between hover:text-gray-300 transition-colors"
@@ -93,31 +85,62 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
             {espaciosOpen && (
               <ul className="bg-black">
                 <li>
-                  <a
-                    href="https://www.estadiognpseguros.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full text-left py-5 pl-2 text-xl text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
-                    data-testid="menu-item-estadio-gnp"
+                  <button
+                    className="block w-full text-left py-4 pl-4 text-lg text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
+                    data-testid="menu-item-gnp-premium"
                     onClick={onClose}
                   >
-                    Estadio GNP Seguros
-                  </a>
+                    GNP Premium Pass
+                  </button>
                 </li>
                 <li>
                   <a
-                    href="https://www.palaciodelosdeportes.mx/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full text-left py-5 pl-2 text-xl text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
-                    data-testid="menu-item-palacio"
+                    href={reglamentoPdfUrl}
+                    download="Reglamento-GNP-Premium-Pass.pdf"
+                    className="block w-full text-left py-4 pl-4 text-lg text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
+                    data-testid="menu-item-reglamento"
                     onClick={onClose}
                   >
-                    Palacio de los Deportes
+                    Reglamento GNP Premium Pass
                   </a>
+                </li>
+                <li>
+                  <button
+                    className="block w-full text-left py-4 pl-4 text-lg text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
+                    data-testid="menu-item-boxes"
+                    onClick={onClose}
+                  >
+                    Boxes
+                  </button>
                 </li>
               </ul>
             )}
+          </li>
+
+          <li>
+            <a
+              href="https://www.estadiognpseguros.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full text-left py-5 text-xl text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
+              data-testid="menu-item-estadio-gnp"
+              onClick={onClose}
+            >
+              Estadio GNP Seguros
+            </a>
+          </li>
+
+          <li>
+            <a
+              href="https://www.palaciodelosdeportes.mx/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full text-left py-5 text-xl text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
+              data-testid="menu-item-palacio"
+              onClick={onClose}
+            >
+              Palacio de los Deportes
+            </a>
           </li>
 
           <li>
@@ -151,13 +174,21 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
           >
             <div className="flex items-center gap-3">
               <Globe size={20} strokeWidth={1.5} />
-              <span className="text-base">Inglés</span>
+              <span className="text-base">Español</span>
             </div>
             <ChevronDown
               size={18}
               className={`transition-transform duration-200 ${idiomaOpen ? "rotate-180" : ""}`}
             />
           </button>
+
+          {idiomaOpen && (
+            <div className="pb-3">
+              <button className="block w-full text-left py-3 pl-9 text-base text-white border-t border-gray-800 hover:text-gray-300 transition-colors">
+                English
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="px-6 py-6 space-y-4">
@@ -165,13 +196,13 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
             className="block text-sm text-gray-400 hover:text-white transition-colors text-left"
             data-testid="menu-link-privacidad"
           >
-            Política de privacidad de Ticketmaster
+            Ticketmaster aviso de privacidad
           </button>
           <button
             className="block text-sm text-gray-400 hover:text-white transition-colors text-left"
             data-testid="menu-link-condiciones"
           >
-            Condiciones de uso
+            Términos de uso
           </button>
         </div>
 
