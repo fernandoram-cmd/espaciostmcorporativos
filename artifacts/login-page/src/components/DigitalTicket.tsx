@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import ticketmasterLogo from "@assets/ticketmaster-logo.png";
+import ticketmasterLogo from "@assets/IMG_6672_1776141009658.jpeg";
 
 function SafetixBarcode() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -100,14 +100,14 @@ export default function DigitalTicket({ userName }: { userName: string }) {
           BTS WORLD TOUR &lsquo;ARIRANG&rsquo; IN MEXICO CITY
         </p>
 
-        <div className="flex items-center justify-between mb-4 mt-2">
-          <h2 className="text-xl font-bold text-gray-900">Boxes Oro</h2>
+        <div className="flex items-center gap-2 mb-4 mt-2">
           <button
             className="w-7 h-7 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-500 font-bold text-sm flex-shrink-0"
             aria-label="Información"
           >
             i
           </button>
+          <h2 className="text-xl font-bold text-gray-900">Boxes Oro</h2>
         </div>
 
         <div className="flex gap-6 mb-6">
@@ -129,13 +129,6 @@ export default function DigitalTicket({ userName }: { userName: string }) {
             </p>
             <p className="text-2xl font-black text-gray-900 leading-none">4</p>
           </div>
-        </div>
-
-        <div className="mb-1">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
-            Titular
-          </p>
-          <p className="text-sm font-semibold text-gray-800 mb-5">{userName}</p>
         </div>
 
         <div className="mb-2">
