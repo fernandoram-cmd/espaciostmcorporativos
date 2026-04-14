@@ -1,5 +1,27 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useAuth } from "@/context/auth";
 import ticketmasterLogo from "@assets/IMG_6672_1776141009658.jpeg";
+
+const DOWNLOADS_KEY = "ec_pass_downloads";
+
+function hasDownloaded(email: string): boolean {
+  try {
+    const data = localStorage.getItem(DOWNLOADS_KEY);
+    const map: Record<string, boolean> = data ? JSON.parse(data) : {};
+    return !!map[email.toLowerCase()];
+  } catch {
+    return false;
+  }
+}
+
+function markDownloaded(email: string) {
+  try {
+    const data = localStorage.getItem(DOWNLOADS_KEY);
+    const map: Record<string, boolean> = data ? JSON.parse(data) : {};
+    map[email.toLowerCase()] = true;
+    localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(map));
+  } catch {}
+}
 
 function SafetixBarcode() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,7 +50,6 @@ function SafetixBarcode() {
       const h = canvas.height;
       const ctx = canvas.getContext("2d")!;
       const snapshot = ctx.getImageData(0, 0, w, h);
-
       posRef.current = 0;
 
       function animate() {
@@ -78,6 +99,21 @@ function SafetixBarcode() {
 const pkpassUrl = `${import.meta.env.BASE_URL}pase-evento.pkpass`;
 
 export default function DigitalTicket({ userName }: { userName: string }) {
+  const { user } = useAuth();
+  const [downloaded, setDownloaded] = useState(false);
+
+  useEffect(() => {
+    if (user?.email) {
+      setDownloaded(hasDownloaded(user.email));
+    }
+  }, [user?.email]);
+
+  const handleDownload = useCallback(() => {
+    if (!user?.email || downloaded) return;
+    markDownloaded(user.email);
+    setDownloaded(true);
+  }, [user?.email, downloaded]);
+
   return (
     <div
       className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 mb-6 bg-white"
@@ -147,17 +183,26 @@ export default function DigitalTicket({ userName }: { userName: string }) {
       </div>
 
       <div className="px-5 py-4">
-        <a
-          href={pkpassUrl}
-          download="pase-evento.pkpass"
-          className="flex items-center justify-center gap-3 w-full bg-black text-white py-3 px-5 rounded-xl"
-          data-testid="button-wallet"
-        >
-          <span className="text-2xl leading-none">🎫</span>
-          <span className="flex flex-col items-start leading-tight">
-            <span className="text-base font-bold">Agregar a wallet</span>
-          </span>
-        </a>
+        {downloaded ? (
+          <div
+            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-500 py-3 px-5 rounded-xl border border-gray-200"
+            data-testid="button-wallet-downloaded"
+          >
+            <span className="text-lg">✓</span>
+            <span className="text-sm font-semibold">Cartera descargada</span>
+          </div>
+        ) : (
+          <a
+            href={pkpassUrl}
+            download="pase-evento.pkpass"
+            onClick={handleDownload}
+            className="flex items-center justify-center gap-3 w-full bg-black text-white py-3 px-5 rounded-xl hover:bg-gray-900 transition-colors"
+            data-testid="button-wallet"
+          >
+            <span className="text-2xl leading-none">🎫</span>
+            <span className="text-base font-bold">Añadir a cartera</span>
+          </a>
+        )}
       </div>
     </div>
   );
