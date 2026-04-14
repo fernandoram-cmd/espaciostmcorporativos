@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import ticketmasterLogo from "@assets/ticketmaster-logo.png";
 
 function SafetixBarcode() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -82,14 +83,13 @@ export default function DigitalTicket({ userName }: { userName: string }) {
       className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 mb-6 bg-white"
       data-testid="digital-ticket"
     >
-      <div className="bg-[#026CDF] px-5 py-3 flex items-center justify-center">
-        <span
-          className="text-white text-xl font-black italic select-none"
-          style={{ fontFamily: "Georgia, 'Times New Roman', serif", letterSpacing: "-0.01em" }}
-        >
-          ticketmaster
-          <sup className="text-sm font-bold not-italic align-super" style={{ fontSize: "0.6em" }}>®</sup>
-        </span>
+      <div className="w-full">
+        <img
+          src={ticketmasterLogo}
+          alt="Ticketmaster"
+          className="w-full object-cover"
+          style={{ display: "block" }}
+        />
       </div>
 
       <div className="px-5 pt-5 pb-0">
@@ -162,8 +162,7 @@ export default function DigitalTicket({ userName }: { userName: string }) {
         >
           <span className="text-2xl leading-none">🎫</span>
           <span className="flex flex-col items-start leading-tight">
-            <span className="text-[11px] font-normal opacity-80">Agregar a</span>
-            <span className="text-base font-bold">Apple Wallet</span>
+            <span className="text-base font-bold">Agregar a wallet</span>
           </span>
         </a>
       </div>
