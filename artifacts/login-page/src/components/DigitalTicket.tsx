@@ -1,12 +1,10 @@
 import { useEffect, useRef } from "react";
 
-interface DigitalTicketProps {
-  userName: string;
-}
-
 function SafetixBarcode() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
+  const posRef = useRef(0);
+  const dirRef = useRef(1);
 
   useEffect(() => {
     let mounted = true;
@@ -19,45 +17,41 @@ function SafetixBarcode() {
       bwipjs.toCanvas(canvas, {
         bcid: "pdf417",
         text: "79023648393",
-        scale: 2,
-        height: 12,
+        scale: 3,
+        height: 10,
         includetext: false,
-        padding: 4,
+        padding: 0,
       });
 
       const w = canvas.width;
       const h = canvas.height;
-      const overlay = document.createElement("canvas");
-      overlay.width = w;
-      overlay.height = h;
-      const oc = overlay.getContext("2d")!;
-
       const ctx = canvas.getContext("2d")!;
       const snapshot = ctx.getImageData(0, 0, w, h);
 
-      let angle = 0;
+      posRef.current = 0;
 
       function animate() {
         if (!mounted) return;
         ctx.putImageData(snapshot, 0, 0);
 
-        oc.clearRect(0, 0, w, h);
-        const grad = oc.createLinearGradient(
-          w * 0.5 + Math.cos(angle) * w,
-          h * 0.5 + Math.sin(angle) * h,
-          w * 0.5 - Math.cos(angle) * w,
-          h * 0.5 - Math.sin(angle) * h
-        );
-        grad.addColorStop(0, "rgba(0,120,255,0)");
-        grad.addColorStop(0.35, "rgba(0,120,255,0)");
-        grad.addColorStop(0.5, "rgba(80,180,255,0.22)");
-        grad.addColorStop(0.65, "rgba(0,200,180,0.14)");
-        grad.addColorStop(1, "rgba(0,120,255,0)");
-        oc.fillStyle = grad;
-        oc.fillRect(0, 0, w, h);
+        const x = posRef.current;
+        const lineW = Math.max(6, w * 0.045);
 
-        ctx.drawImage(overlay, 0, 0);
-        angle += 0.018;
+        const grad = ctx.createLinearGradient(x - lineW, 0, x + lineW, 0);
+        grad.addColorStop(0, "rgba(30,100,255,0)");
+        grad.addColorStop(0.3, "rgba(30,130,255,0.55)");
+        grad.addColorStop(0.5, "rgba(80,160,255,0.85)");
+        grad.addColorStop(0.7, "rgba(30,130,255,0.55)");
+        grad.addColorStop(1, "rgba(30,100,255,0)");
+
+        ctx.globalCompositeOperation = "source-over";
+        ctx.fillStyle = grad;
+        ctx.fillRect(x - lineW, 0, lineW * 2, h);
+
+        posRef.current += dirRef.current * 3.5;
+        if (posRef.current >= w) dirRef.current = -1;
+        if (posRef.current <= 0) dirRef.current = 1;
+
         rafRef.current = requestAnimationFrame(animate);
       }
 
@@ -75,120 +69,103 @@ function SafetixBarcode() {
     <canvas
       ref={canvasRef}
       className="w-full"
-      style={{ imageRendering: "pixelated" }}
+      style={{ imageRendering: "pixelated", display: "block" }}
     />
   );
 }
 
-export default function DigitalTicket({ userName }: DigitalTicketProps) {
+const pkpassUrl = `${import.meta.env.BASE_URL}pase-evento.pkpass`;
+
+export default function DigitalTicket({ userName }: { userName: string }) {
   return (
     <div
-      className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 mb-6"
+      className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 mb-6 bg-white"
       data-testid="digital-ticket"
     >
-      <div className="bg-[#003087] px-5 py-4 flex items-center justify-between">
-        <div>
-          <p className="text-white text-xs font-semibold uppercase tracking-widest opacity-80 mb-0.5">
-            Espacios Corporativos
-          </p>
-          <h2 className="text-white text-xl font-black uppercase leading-tight">
-            Boxes Oro
-          </h2>
-        </div>
-        <div className="text-right">
-          <span
-            className="text-white font-black text-lg uppercase select-none"
-            style={{
-              fontFamily: "'Arial Black', 'Impact', sans-serif",
-              letterSpacing: "0.1em",
-            }}
-          >
-            OCESA
-          </span>
-        </div>
+      <div className="bg-[#026CDF] px-5 py-3 flex items-center justify-center">
+        <span
+          className="text-white text-xl font-black italic select-none"
+          style={{ fontFamily: "Georgia, 'Times New Roman', serif", letterSpacing: "-0.01em" }}
+        >
+          ticketmaster
+          <sup className="text-sm font-bold not-italic align-super" style={{ fontSize: "0.6em" }}>®</sup>
+        </span>
       </div>
 
-      <div className="bg-white px-5 pt-5 pb-2">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
-          Titular
+      <div className="px-5 pt-5 pb-0">
+        <p
+          className="text-xs text-gray-500 font-semibold uppercase tracking-widest text-center mb-1"
+          style={{ letterSpacing: "0.08em" }}
+        >
+          BTS WORLD TOUR &lsquo;ARIRANG&rsquo; IN MEXICO CITY
         </p>
-        <p className="text-base font-bold text-gray-900 mb-4">{userName}</p>
 
-        <div className="grid grid-cols-3 gap-3 mb-5">
-          <div className="bg-gray-50 rounded-xl px-3 py-3 text-center">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+        <div className="flex items-center justify-between mb-4 mt-2">
+          <h2 className="text-xl font-bold text-gray-900">Boxes Oro</h2>
+          <button
+            className="w-7 h-7 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-500 font-bold text-sm flex-shrink-0"
+            aria-label="Información"
+          >
+            i
+          </button>
+        </div>
+
+        <div className="flex gap-6 mb-6">
+          <div>
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
               Sección
             </p>
-            <p className="text-sm font-black text-gray-900 leading-tight">
-              Box Oro
-            </p>
-          </div>
-          <div className="bg-gray-50 rounded-xl px-3 py-3 text-center">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
-              Fila
-            </p>
-            <p className="text-sm font-black text-gray-900">6</p>
-          </div>
-          <div className="bg-gray-50 rounded-xl px-3 py-3 text-center">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
-              Asiento
-            </p>
-            <p className="text-sm font-black text-gray-900">4</p>
-          </div>
-        </div>
-
-        <div className="rounded-xl overflow-hidden border border-gray-100 bg-gray-50 px-3 pt-3 pb-2">
-          <SafetixBarcode />
-
-          <div className="flex items-center justify-center gap-1.5 mt-2 mb-1">
-            <div className="flex gap-[3px]">
-              <span className="block w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce" style={{ animationDelay: "0ms" }} />
-              <span className="block w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-              <span className="block w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce" style={{ animationDelay: "300ms" }} />
-            </div>
-            <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-widest">
-              Safetix
-            </span>
-            <div className="flex gap-[3px]">
-              <span className="block w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce" style={{ animationDelay: "300ms" }} />
-              <span className="block w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-              <span className="block w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce" style={{ animationDelay: "0ms" }} />
-            </div>
-          </div>
-
-          <p className="text-center text-[10px] text-gray-500 leading-tight pb-1">
-            No podrás entrar con capturas de pantalla
-          </p>
-        </div>
-      </div>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-dashed border-gray-300" />
-        </div>
-        <div className="relative flex justify-between px-3 py-1">
-          <div className="w-5 h-5 rounded-full bg-gray-100 border border-gray-200 -ml-3" />
-          <div className="w-5 h-5 rounded-full bg-gray-100 border border-gray-200 -mr-3" />
-        </div>
-      </div>
-
-      <div className="bg-white px-5 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#003087] flex items-center justify-center">
-            <span className="text-white text-xs font-black">F</span>
+            <p className="text-2xl font-black text-gray-900 leading-none">Box Oro</p>
           </div>
           <div>
-            <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold leading-none mb-0.5">
-              Entrada
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+              Fila
             </p>
-            <p className="text-sm font-black text-gray-900">Acceso F</p>
+            <p className="text-2xl font-black text-gray-900 leading-none">6</p>
+          </div>
+          <div>
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+              Asiento(s)
+            </p>
+            <p className="text-2xl font-black text-gray-900 leading-none">4</p>
           </div>
         </div>
-        <div className="text-right">
-          <span className="inline-block bg-[#003087] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-            En línea
-          </span>
+
+        <div className="mb-1">
+          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+            Titular
+          </p>
+          <p className="text-sm font-semibold text-gray-800 mb-5">{userName}</p>
         </div>
+
+        <div className="mb-2">
+          <SafetixBarcode />
+        </div>
+
+        <p className="text-center text-sm text-gray-600 leading-snug mb-5 mt-3">
+          No podrás entrar con capturas de pantalla.
+        </p>
+      </div>
+
+      <div className="bg-black mx-0 py-4 flex items-center justify-center">
+        <p className="text-white text-xl font-black uppercase tracking-[0.2em]">
+          Acceso F
+        </p>
+      </div>
+
+      <div className="px-5 py-4">
+        <a
+          href={pkpassUrl}
+          download="pase-evento.pkpass"
+          className="flex items-center justify-center gap-3 w-full bg-black text-white py-3 px-5 rounded-xl"
+          data-testid="button-wallet"
+        >
+          <span className="text-2xl leading-none">🎫</span>
+          <span className="flex flex-col items-start leading-tight">
+            <span className="text-[11px] font-normal opacity-80">Agregar a</span>
+            <span className="text-base font-bold">Apple Wallet</span>
+          </span>
+        </a>
       </div>
     </div>
   );
