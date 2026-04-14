@@ -101,6 +101,8 @@ const pkpassUrl = `${import.meta.env.BASE_URL}pase-evento.pkpass`;
 export default function DigitalTicket({ userName }: { userName: string }) {
   const { user } = useAuth();
   const [downloaded, setDownloaded] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const infoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (user?.email) {
@@ -114,21 +116,27 @@ export default function DigitalTicket({ userName }: { userName: string }) {
     setDownloaded(true);
   }, [user?.email, downloaded]);
 
+  const handleInfo = useCallback(() => {
+    setShowInfo(true);
+    if (infoTimerRef.current) clearTimeout(infoTimerRef.current);
+    infoTimerRef.current = setTimeout(() => setShowInfo(false), 3000);
+  }, []);
+
   return (
     <div
       className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 mb-6 bg-white"
       data-testid="digital-ticket"
     >
-      <div className="w-full bg-[#1C62E3] flex items-center justify-center" style={{ height: "52px" }}>
+      <div className="w-full overflow-hidden" style={{ height: "52px" }}>
         <img
           src={ticketmasterLogo}
           alt="Ticketmaster"
-          className="h-full object-contain"
+          className="w-full h-full object-cover"
           style={{ display: "block" }}
         />
       </div>
 
-      <div className="px-5 pt-5 pb-0">
+      <div className="px-5 pt-6 pb-0">
         <p
           className="text-xs text-gray-500 font-semibold uppercase tracking-widest text-center mb-1"
           style={{ letterSpacing: "0.08em" }}
@@ -136,53 +144,62 @@ export default function DigitalTicket({ userName }: { userName: string }) {
           BTS WORLD TOUR &lsquo;ARIRANG&rsquo; IN MEXICO CITY
         </p>
 
-        <div className="flex items-center justify-between mb-4 mt-2">
+        <div className="flex items-center justify-between mb-5 mt-3">
           <h2 className="text-xl font-bold text-gray-900">Boxes Oro</h2>
-          <button
-            className="w-7 h-7 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-500 font-bold text-sm flex-shrink-0"
-            aria-label="Información"
-          >
-            i
-          </button>
+          <div className="relative">
+            <button
+              onClick={handleInfo}
+              className="w-7 h-7 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-500 font-bold text-sm flex-shrink-0"
+              aria-label="Información"
+            >
+              i
+            </button>
+            {showInfo && (
+              <div className="absolute right-0 top-9 flex items-center gap-1.5 bg-gray-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap z-10 animate-fade-in">
+                <span>⚠️</span>
+                <span>Boleto digital</span>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="flex justify-between mb-6">
+        <div className="flex justify-between mb-8">
           <div>
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
               Sección
             </p>
             <p className="text-2xl font-black text-gray-900 leading-none">Box Oro</p>
           </div>
           <div className="text-center">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
               Fila
             </p>
             <p className="text-2xl font-black text-gray-900 leading-none">6</p>
           </div>
           <div className="text-right">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
               Asiento(s)
             </p>
             <p className="text-2xl font-black text-gray-900 leading-none">4</p>
           </div>
         </div>
 
-        <div className="mb-2">
+        <div className="mb-0">
           <SafetixBarcode />
         </div>
 
-        <p className="text-center text-sm text-gray-600 leading-snug mb-5 mt-3">
+        <p className="text-center text-sm text-gray-600 leading-snug mb-8 mt-4">
           No podrás entrar con capturas de pantalla.
         </p>
       </div>
 
-      <div className="bg-black mx-0 py-4 flex items-center justify-center">
+      <div className="bg-black mx-0 py-5 flex items-center justify-center">
         <p className="text-white text-xl font-black uppercase tracking-[0.2em]">
           Acceso F
         </p>
       </div>
 
-      <div className="px-5 py-4">
+      <div className="px-5 py-5">
         {downloaded ? (
           <div
             className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-500 py-3 px-5 rounded-xl border border-gray-200"
