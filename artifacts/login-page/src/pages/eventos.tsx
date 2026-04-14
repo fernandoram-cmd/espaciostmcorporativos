@@ -118,7 +118,7 @@ export default function EventosPage() {
               data-testid="button-download-pass"
             >
               <Download size={16} />
-              Agregar a Apple Wallet
+              Agregar a billetera
             </a>
           </div>
         </div>
