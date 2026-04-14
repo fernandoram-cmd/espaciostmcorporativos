@@ -4,6 +4,7 @@ import { RefreshCw, Ticket, Download, MapPin, Calendar } from "lucide-react";
 import { useAuth } from "@/context/auth";
 import AppHeader from "@/components/AppHeader";
 import MenuDrawer from "@/components/MenuDrawer";
+import DigitalTicket from "@/components/DigitalTicket";
 
 export default function EventosPage() {
   const { user, logout } = useAuth();
@@ -54,6 +55,8 @@ export default function EventosPage() {
           <RefreshCw size={18} strokeWidth={1.5} />
           <span className="text-base">Mis anuncios</span>
         </button>
+
+        <DigitalTicket userName={user.name} />
 
         <div
           className="rounded-2xl overflow-hidden shadow-lg border border-gray-200"

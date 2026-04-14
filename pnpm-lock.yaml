@@ -221,6 +221,10 @@ importers:
         version: 3.1.0
 
   artifacts/login-page:
+    dependencies:
+      bwip-js:
+        specifier: ^4.9.0
+        version: 4.9.0
     devDependencies:
       '@hookform/resolvers':
         specifier: ^3.10.0
@@ -1784,6 +1788,10 @@ packages:
   browserslist@4.28.1:
     resolution: {integrity: sha512-ZC5Bd0LgJXgwGqUknZY/vkUQ04r8NXnJZ3yYi4vDmSiZmC/pdSN0NbNRPxZpbtO4uAfDUAFffO8IZoM3Gj8IkA==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
+    hasBin: true
+
+  bwip-js@4.9.0:
+    resolution: {integrity: sha512-U3aWIxR/Px4m3GPd0opQ5GQJq/G8Cj0cr5z5hrcvy/SAApPnfkLqBqjRuB3GiEAasEQup3m7k/MDM/uiS9te8Q==}
     hasBin: true
 
   bytes@3.1.2:
@@ -4484,6 +4492,8 @@ snapshots:
       electron-to-chromium: 1.5.307
       node-releases: 2.0.36
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
+
+  bwip-js@4.9.0: {}
 
   bytes@3.1.2: {}
 
