@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useAuth } from "@/context/auth";
 
 const DOWNLOADS_KEY = "ec_pass_downloads";
-const BARCODE_INTERVAL_MS = 30000;
+const BARCODE_INTERVAL_MS = 10000;
 
 function hasDownloaded(email: string): boolean {
   try {
@@ -108,6 +108,7 @@ export default function DigitalTicket({ userName }: { userName: string }) {
   const [downloaded, setDownloaded] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [barcodeCode, setBarcodeCode] = useState(() => generateCode());
+  const [barcodeFlash, setBarcodeFlash] = useState(false);
   const infoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -118,7 +119,11 @@ export default function DigitalTicket({ userName }: { userName: string }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setBarcodeCode(generateCode());
+      setBarcodeFlash(true);
+      setTimeout(() => {
+        setBarcodeCode(generateCode());
+        setBarcodeFlash(false);
+      }, 400);
     }, BARCODE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, []);
@@ -205,7 +210,10 @@ export default function DigitalTicket({ userName }: { userName: string }) {
           </div>
         </div>
 
-        <div className="mb-0 px-4">
+        <div
+          className="mb-0 px-4 transition-opacity duration-300"
+          style={{ opacity: barcodeFlash ? 0 : 1 }}
+        >
           <SafetixBarcode code={barcodeCode} />
         </div>
 
