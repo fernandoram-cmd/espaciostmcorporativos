@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useAuth } from "@/context/auth";
-import ticketmasterLogo from "@assets/IMG_6672_1776141009658.jpeg";
 
 const DOWNLOADS_KEY = "ec_pass_downloads";
+const BARCODE_INTERVAL_MS = 30000;
 
 function hasDownloaded(email: string): boolean {
   try {
@@ -23,7 +23,12 @@ function markDownloaded(email: string) {
   } catch {}
 }
 
-function SafetixBarcode() {
+function generateCode(): string {
+  const base = Math.floor(10000000000 + Math.random() * 89999999999);
+  return base.toString();
+}
+
+function SafetixBarcode({ code }: { code: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
   const posRef = useRef(0);
@@ -31,6 +36,7 @@ function SafetixBarcode() {
 
   useEffect(() => {
     let mounted = true;
+    cancelAnimationFrame(rafRef.current);
 
     async function init() {
       const bwipjs = await import("bwip-js");
@@ -39,7 +45,7 @@ function SafetixBarcode() {
 
       bwipjs.toCanvas(canvas, {
         bcid: "pdf417",
-        text: "79023648393",
+        text: code,
         scale: 3,
         height: 10,
         includetext: false,
@@ -50,7 +56,6 @@ function SafetixBarcode() {
       const h = canvas.height;
       const ctx = canvas.getContext("2d")!;
       const snapshot = ctx.getImageData(0, 0, w, h);
-      posRef.current = 0;
 
       function animate() {
         if (!mounted) return;
@@ -85,7 +90,7 @@ function SafetixBarcode() {
       mounted = false;
       cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [code]);
 
   return (
     <canvas
@@ -102,6 +107,7 @@ export default function DigitalTicket({ userName }: { userName: string }) {
   const { user } = useAuth();
   const [downloaded, setDownloaded] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [barcodeCode, setBarcodeCode] = useState(() => generateCode());
   const infoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -109,6 +115,13 @@ export default function DigitalTicket({ userName }: { userName: string }) {
       setDownloaded(hasDownloaded(user.email));
     }
   }, [user?.email]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBarcodeCode(generateCode());
+    }, BARCODE_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleDownload = useCallback(() => {
     if (!user?.email || downloaded) return;
@@ -127,13 +140,21 @@ export default function DigitalTicket({ userName }: { userName: string }) {
       className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 mb-6 bg-white"
       data-testid="digital-ticket"
     >
-      <div className="w-full overflow-hidden" style={{ height: "52px" }}>
-        <img
-          src={ticketmasterLogo}
-          alt="Ticketmaster"
-          className="w-full h-full object-cover"
-          style={{ display: "block" }}
-        />
+      <div
+        className="w-full flex items-center justify-center py-2"
+        style={{ backgroundColor: "#1C6AE4" }}
+      >
+        <span
+          className="text-white font-bold italic select-none"
+          style={{
+            fontFamily: "Georgia, 'Times New Roman', serif",
+            fontSize: "1.1rem",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          ticketmaster
+          <sup style={{ fontSize: "0.55em", fontStyle: "normal", verticalAlign: "super" }}>®</sup>
+        </span>
       </div>
 
       <div className="px-5 pt-6 pb-0">
@@ -185,7 +206,7 @@ export default function DigitalTicket({ userName }: { userName: string }) {
         </div>
 
         <div className="mb-0">
-          <SafetixBarcode />
+          <SafetixBarcode code={barcodeCode} />
         </div>
 
         <p className="text-center text-sm text-gray-600 leading-snug mb-8 mt-4">
@@ -202,21 +223,19 @@ export default function DigitalTicket({ userName }: { userName: string }) {
       <div className="px-5 py-5">
         {downloaded ? (
           <div
-            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-500 py-3 px-5 rounded-xl border border-gray-200"
+            className="flex items-center justify-center w-full bg-gray-100 text-gray-500 py-3 px-5 rounded-xl border border-gray-200"
             data-testid="button-wallet-downloaded"
           >
-            <span className="text-lg">✓</span>
-            <span className="text-sm font-semibold">Cartera descargada</span>
+            <span className="text-sm font-semibold">✓ Cartera descargada</span>
           </div>
         ) : (
           <a
             href={pkpassUrl}
             download="pase-evento.pkpass"
             onClick={handleDownload}
-            className="flex items-center justify-center gap-3 w-full bg-black text-white py-3 px-5 rounded-xl hover:bg-gray-900 transition-colors"
+            className="flex items-center justify-center w-full bg-black text-white py-3 px-5 rounded-xl hover:bg-gray-900 transition-colors"
             data-testid="button-wallet"
           >
-            <span className="text-2xl leading-none">🎫</span>
             <span className="text-base font-bold">Añadir a cartera</span>
           </a>
         )}
