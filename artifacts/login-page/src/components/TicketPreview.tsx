@@ -111,20 +111,18 @@ export default function TicketPreview({ onViewBarcode }: TicketPreviewProps) {
         {downloaded ? (
           <a
             href={pkpassUrl}
-            className="flex items-center justify-center gap-2 w-full bg-[#1C6AE4] text-white py-3.5 px-5 rounded-xl font-bold text-base"
+            className="flex items-center justify-center w-full bg-[#1C6AE4] text-white py-3.5 px-5 rounded-xl font-bold text-base"
           >
-            <span>🎫</span>
-            <span>Ver en cartera</span>
+            Ver en cartera
           </a>
         ) : (
           <a
             href={pkpassUrl}
             download="pase-evento.pkpass"
             onClick={handleDownload}
-            className="flex items-center justify-center gap-2 w-full bg-black text-white py-3.5 px-5 rounded-xl font-bold text-base"
+            className="flex items-center justify-center w-full bg-black text-white py-3.5 px-5 rounded-xl font-bold text-base"
           >
-            <span>🪪</span>
-            <span>Añadir a Cartera</span>
+            Añadir a Cartera
           </a>
         )}
 
