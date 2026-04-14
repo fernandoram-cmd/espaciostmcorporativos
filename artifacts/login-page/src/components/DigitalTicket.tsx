@@ -24,24 +24,29 @@ function markDownloaded(email: string) {
 }
 
 function generateCode(): string {
-  const base = Math.floor(10000000000 + Math.random() * 89999999999);
-  return base.toString();
+  return Math.floor(10000000000 + Math.random() * 89999999999).toString();
 }
 
 function SafetixBarcode({ code }: { code: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number>(0);
+  const stateRef = useRef<{ mounted: boolean; raf: number }>({ mounted: true, raf: 0 });
   const posRef = useRef(0);
   const dirRef = useRef(1);
 
   useEffect(() => {
-    let mounted = true;
-    cancelAnimationFrame(rafRef.current);
+    const state = stateRef.current;
+    state.mounted = true;
+    cancelAnimationFrame(state.raf);
+    posRef.current = 0;
+
+    let bwipLoaded = false;
 
     async function init() {
       const bwipjs = await import("bwip-js");
       const canvas = canvasRef.current;
-      if (!canvas || !mounted) return;
+      if (!state.mounted || !canvas) return;
+
+      bwipLoaded = true;
 
       bwipjs.toCanvas(canvas, {
         bcid: "pdf417",
@@ -58,12 +63,11 @@ function SafetixBarcode({ code }: { code: string }) {
       const snapshot = ctx.getImageData(0, 0, w, h);
 
       function animate() {
-        if (!mounted) return;
+        if (!state.mounted) return;
         ctx.putImageData(snapshot, 0, 0);
 
         const x = posRef.current;
         const lineW = Math.max(6, w * 0.045);
-
         const grad = ctx.createLinearGradient(x - lineW, 0, x + lineW, 0);
         grad.addColorStop(0, "rgba(30,100,255,0)");
         grad.addColorStop(0.3, "rgba(30,130,255,0.55)");
@@ -79,16 +83,18 @@ function SafetixBarcode({ code }: { code: string }) {
         if (posRef.current >= w) dirRef.current = -1;
         if (posRef.current <= 0) dirRef.current = 1;
 
-        rafRef.current = requestAnimationFrame(animate);
+        state.raf = requestAnimationFrame(animate);
       }
 
       animate();
     }
 
     init();
+
     return () => {
-      mounted = false;
-      cancelAnimationFrame(rafRef.current);
+      state.mounted = false;
+      cancelAnimationFrame(state.raf);
+      if (!bwipLoaded) state.mounted = true;
     };
   }, [code]);
 
@@ -170,12 +176,12 @@ export default function DigitalTicket({ userName }: { userName: string }) {
           BTS WORLD TOUR &lsquo;ARIRANG&rsquo; IN MEXICO CITY
         </p>
 
-        <div className="flex items-center justify-between mb-7 mt-4">
-          <h2 className="text-xl font-bold text-gray-900">Boxes Oro</h2>
-          <div className="relative">
+        <div className="relative flex items-center justify-center mb-7 mt-4">
+          <h2 className="text-xl font-bold text-gray-900 text-center">Boxes Oro</h2>
+          <div className="absolute right-0">
             <button
               onClick={handleInfo}
-              className="w-7 h-7 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-500 font-bold text-sm flex-shrink-0"
+              className="w-7 h-7 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-500 font-bold text-sm"
               aria-label="Información"
             >
               i
@@ -230,12 +236,13 @@ export default function DigitalTicket({ userName }: { userName: string }) {
 
       <div className="px-5 py-5">
         {downloaded ? (
-          <div
-            className="flex items-center justify-center w-full bg-gray-100 text-gray-500 py-3 px-5 rounded-xl border border-gray-200"
-            data-testid="button-wallet-downloaded"
+          <a
+            href={pkpassUrl}
+            className="flex items-center justify-center w-full bg-[#1C6AE4] text-white py-3 px-5 rounded-xl hover:bg-blue-600 transition-colors"
+            data-testid="button-view-wallet"
           >
-            <span className="text-sm font-semibold">✓ Cartera descargada</span>
-          </div>
+            <span className="text-base font-bold">Ver en billetera</span>
+          </a>
         ) : (
           <a
             href={pkpassUrl}
