@@ -119,11 +119,11 @@ export default function DigitalTicket({ userName }: { userName: string }) {
       className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 mb-6 bg-white"
       data-testid="digital-ticket"
     >
-      <div className="w-full">
+      <div className="w-full bg-[#1C62E3] flex items-center justify-center" style={{ height: "52px" }}>
         <img
           src={ticketmasterLogo}
           alt="Ticketmaster"
-          className="w-full object-cover"
+          className="h-full object-contain"
           style={{ display: "block" }}
         />
       </div>
@@ -136,30 +136,30 @@ export default function DigitalTicket({ userName }: { userName: string }) {
           BTS WORLD TOUR &lsquo;ARIRANG&rsquo; IN MEXICO CITY
         </p>
 
-        <div className="flex items-center gap-2 mb-4 mt-2">
+        <div className="flex items-center justify-between mb-4 mt-2">
+          <h2 className="text-xl font-bold text-gray-900">Boxes Oro</h2>
           <button
             className="w-7 h-7 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-500 font-bold text-sm flex-shrink-0"
             aria-label="Información"
           >
             i
           </button>
-          <h2 className="text-xl font-bold text-gray-900">Boxes Oro</h2>
         </div>
 
-        <div className="flex gap-6 mb-6">
+        <div className="flex justify-between mb-6">
           <div>
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
               Sección
             </p>
             <p className="text-2xl font-black text-gray-900 leading-none">Box Oro</p>
           </div>
-          <div>
+          <div className="text-center">
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
               Fila
             </p>
             <p className="text-2xl font-black text-gray-900 leading-none">6</p>
           </div>
-          <div>
+          <div className="text-right">
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
               Asiento(s)
             </p>
