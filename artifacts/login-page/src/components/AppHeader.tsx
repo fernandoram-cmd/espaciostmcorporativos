@@ -45,23 +45,16 @@ export default function AppHeader({ userInitial, userName, onMenuOpen, onLogout 
       </button>
 
       <button
-        className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+        className="absolute left-1/2 -translate-x-1/2 hover:opacity-80 transition-opacity"
         onClick={() => setLocation("/dashboard")}
         data-testid="button-logo-home"
         aria-label="Inicio"
       >
-        <span
-          className="text-white font-serif italic text-2xl font-light leading-none select-none"
-          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-        >
-          ú
-        </span>
-        <span
-          className="font-black text-xl uppercase select-none text-white"
-          style={{ fontFamily: "'Arial Black', 'Impact', sans-serif", letterSpacing: "0.14em" }}
-        >
-          OCESA
-        </span>
+        <img
+          src={`${import.meta.env.BASE_URL}ocesa-logo.jpeg`}
+          alt="OCESA"
+          className="h-8 w-auto object-contain select-none"
+        />
       </button>
 
       <div className="flex items-center gap-4">

@@ -208,12 +208,11 @@ export default function AdminPage() {
 
       <header className="bg-black border-b border-gray-800 px-5 py-4 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <span
-            className="font-black text-lg uppercase text-white"
-            style={{ fontFamily: "'Arial Black', Impact, sans-serif", letterSpacing: "0.14em" }}
-          >
-            OCESA
-          </span>
+          <img
+            src={`${import.meta.env.BASE_URL}ocesa-logo.jpeg`}
+            alt="OCESA"
+            className="h-7 w-auto object-contain"
+          />
           <span className="text-gray-600 text-sm">·</span>
           <span className="text-gray-400 text-sm font-medium">Admin</span>
         </div>
