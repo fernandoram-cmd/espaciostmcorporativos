@@ -2,8 +2,7 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider, useAuth } from "@/context/auth";
-import LoadingScreen from "@/components/LoadingScreen";
+import { AuthProvider } from "@/context/auth";
 import LoginPage from "@/pages/login";
 import DashboardPage from "@/pages/dashboard";
 import EventosPage from "@/pages/eventos";
@@ -36,23 +35,13 @@ function Router() {
   );
 }
 
-function AppContent() {
-  const { loading } = useAuth();
-  return (
-    <>
-      {loading && <LoadingScreen />}
-      <Router />
-    </>
-  );
-}
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <AppContent />
+            <Router />
           </WouterRouter>
           <Toaster />
         </TooltipProvider>
