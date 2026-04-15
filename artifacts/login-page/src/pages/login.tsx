@@ -96,14 +96,16 @@ export default function LoginPage() {
   const { login, register, checkEmailExists } = useAuth();
   const [, setLocation] = useLocation();
 
-  const handleEmailContinue = (e: React.FormEvent) => {
+  const handleEmailContinue = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!email || !email.includes("@")) {
       setError("Ingresa un correo electrónico válido.");
       return;
     }
-    const exists = checkEmailExists(email);
+    setLoading(true);
+    const exists = await checkEmailExists(email);
+    setLoading(false);
     setStep(exists ? "password" : "register");
   };
 

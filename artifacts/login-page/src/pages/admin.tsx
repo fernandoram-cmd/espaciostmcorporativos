@@ -110,11 +110,10 @@ function DeleteConfirm({ user, onConfirm, onClose }: DeleteConfirmProps) {
 
 export default function AdminPage() {
   const {
-    user, loading, logout, getAllUsers, getTicketPermissions,
+    user, loading, logout, getAllUsers,
     setTicketPermission, deleteUser, changeUserPassword, approveAll, revokeAll,
   } = useAuth();
   const [, setLocation] = useLocation();
-  const [permissions, setPermissions] = useState<Record<string, boolean>>({});
   const [allUsers, setAllUsers] = useState<StoredUser[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterTab>("todos");
@@ -123,10 +122,10 @@ export default function AdminPage() {
   const [deleteModal, setDeleteModal] = useState<StoredUser | null>(null);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
 
-  const refresh = useCallback(() => {
-    setAllUsers(getAllUsers());
-    setPermissions(getTicketPermissions());
-  }, [getAllUsers, getTicketPermissions]);
+  const refresh = useCallback(async () => {
+    const users = await getAllUsers();
+    setAllUsers(users);
+  }, [getAllUsers]);
 
   useEffect(() => {
     if (loading) return;
@@ -139,35 +138,37 @@ export default function AdminPage() {
     setTimeout(() => setToast(""), 2500);
   };
 
-  const handleToggle = (email: string, current: boolean) => {
+  const handleToggle = async (email: string, current: boolean) => {
     const next = !current;
-    setTicketPermission(email, next);
-    setPermissions((prev) => ({ ...prev, [email.toLowerCase()]: next }));
+    await setTicketPermission(email, next);
+    setAllUsers((prev) =>
+      prev.map((u) => u.email === email ? { ...u, hasAccess: next } : u)
+    );
     showToast(next ? `✓ Acceso concedido` : `Acceso revocado`);
   };
 
-  const handleApproveAll = () => {
-    approveAll();
-    refresh();
+  const handleApproveAll = async () => {
+    await approveAll();
+    await refresh();
     showToast(`✓ Acceso concedido a todos los usuarios`);
   };
 
-  const handleRevokeAll = () => {
-    revokeAll();
-    refresh();
+  const handleRevokeAll = async () => {
+    await revokeAll();
+    await refresh();
     showToast(`Acceso revocado a todos los usuarios`);
   };
 
-  const handleDelete = (u: StoredUser) => {
-    deleteUser(u.email);
+  const handleDelete = async (u: StoredUser) => {
+    await deleteUser(u.email);
     setDeleteModal(null);
     setExpandedUser(null);
-    refresh();
+    await refresh();
     showToast(`Usuario ${u.name} eliminado`);
   };
 
-  const handlePasswordChange = (email: string, pwd: string) => {
-    changeUserPassword(email, pwd);
+  const handlePasswordChange = async (email: string, pwd: string) => {
+    await changeUserPassword(email, pwd);
     setPwdModal(null);
     showToast(`✓ Contraseña actualizada`);
   };
@@ -176,7 +177,7 @@ export default function AdminPage() {
 
   if (loading || !user || user.role !== "admin") return null;
 
-  const approvedCount = allUsers.filter((u) => !!permissions[u.email.toLowerCase()]).length;
+  const approvedCount = allUsers.filter((u) => u.hasAccess).length;
   const noAccessCount = allUsers.length - approvedCount;
 
   const filtered = allUsers.filter((u) => {
@@ -184,8 +185,8 @@ export default function AdminPage() {
       u.name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase());
     if (!matchSearch) return false;
-    if (filter === "con-acceso") return !!permissions[u.email.toLowerCase()];
-    if (filter === "sin-acceso") return !permissions[u.email.toLowerCase()];
+    if (filter === "con-acceso") return u.hasAccess;
+    if (filter === "sin-acceso") return !u.hasAccess;
     return true;
   });
 
@@ -290,9 +291,7 @@ export default function AdminPage() {
                 key={val}
                 onClick={() => setFilter(val)}
                 className={`flex-1 text-xs font-semibold py-1.5 rounded-md transition-colors ${
-                  filter === val
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-400 hover:text-white"
+                  filter === val ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"
                 }`}
               >
                 {label}
@@ -311,7 +310,6 @@ export default function AdminPage() {
         ) : (
           <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
             {filtered.map((u, i) => {
-              const allowed = !!permissions[u.email.toLowerCase()];
               const expanded = expandedUser === u.email;
               return (
                 <div key={u.email} className={i < filtered.length - 1 ? "border-b border-gray-800" : ""}>
@@ -329,21 +327,20 @@ export default function AdminPage() {
 
                     <div className="flex items-center gap-3 flex-shrink-0">
                       <button
-                        onClick={() => handleToggle(u.email, allowed)}
+                        onClick={() => handleToggle(u.email, u.hasAccess)}
                         className={`relative inline-flex h-5 w-9 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-                          allowed ? "bg-blue-500" : "bg-gray-700"
+                          u.hasAccess ? "bg-blue-500" : "bg-gray-700"
                         }`}
                         role="switch"
-                        aria-checked={allowed}
-                        title={allowed ? "Revocar acceso" : "Dar acceso"}
+                        aria-checked={u.hasAccess}
+                        title={u.hasAccess ? "Revocar acceso" : "Dar acceso"}
                       >
-                        <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform duration-200 ${allowed ? "translate-x-4" : "translate-x-0"}`} />
+                        <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform duration-200 ${u.hasAccess ? "translate-x-4" : "translate-x-0"}`} />
                       </button>
 
                       <button
                         onClick={() => setExpandedUser(expanded ? null : u.email)}
                         className="text-gray-500 hover:text-white transition-colors"
-                        title="Más opciones"
                       >
                         <ChevronDown size={16} className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
                       </button>
@@ -352,8 +349,8 @@ export default function AdminPage() {
 
                   {expanded && (
                     <div className="px-4 pb-4 flex gap-2 border-t border-gray-800 pt-3 bg-gray-950">
-                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full mr-auto ${allowed ? "bg-green-900/50 text-green-400" : "bg-gray-800 text-gray-500"}`}>
-                        {allowed ? "Con acceso" : "Sin acceso"}
+                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full mr-auto ${u.hasAccess ? "bg-green-900/50 text-green-400" : "bg-gray-800 text-gray-500"}`}>
+                        {u.hasAccess ? "Con acceso" : "Sin acceso"}
                       </span>
                       <button
                         onClick={() => setPwdModal(u)}

@@ -1,9 +1,16 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 
 export interface User {
   email: string;
   name: string;
   role: string;
+}
+
+export interface StoredUser {
+  email: string;
+  name: string;
+  role: string;
+  hasAccess: boolean;
 }
 
 interface AuthContextType {
@@ -12,55 +19,27 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
-  checkEmailExists: (email: string) => boolean;
-  getAllUsers: () => StoredUser[];
-  getTicketPermissions: () => Record<string, boolean>;
-  setTicketPermission: (email: string, allowed: boolean) => void;
-  hasTicketAccess: (email: string) => boolean;
-  deleteUser: (email: string) => void;
-  changeUserPassword: (email: string, newPassword: string) => void;
-  approveAll: () => void;
-  revokeAll: () => void;
+  checkEmailExists: (email: string) => Promise<boolean>;
+  getAllUsers: () => Promise<StoredUser[]>;
+  setTicketPermission: (email: string, allowed: boolean) => Promise<void>;
+  hasTicketAccess: (email: string) => Promise<boolean>;
+  deleteUser: (email: string) => Promise<void>;
+  changeUserPassword: (email: string, newPassword: string) => Promise<void>;
+  approveAll: () => Promise<void>;
+  revokeAll: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const USERS_KEY = "ec_users";
 const SESSION_KEY = "ec_session";
-const PERMISSIONS_KEY = "ec_ticket_permissions";
+const API = "/api";
 
-const ADMIN_EMAIL = "ramirez.ferni1545@gmail.com";
-const ADMIN_PASSWORD = "Liapig1573";
-
-export interface StoredUser {
-  email: string;
-  password: string;
-  name: string;
-  role: string;
-}
-
-function getStoredUsers(): StoredUser[] {
-  try {
-    const data = localStorage.getItem(USERS_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveUsers(users: StoredUser[]) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-function seedAdmin() {
-  const users = getStoredUsers();
-  const adminExists = users.some((u) => u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
-  if (!adminExists) {
-    saveUsers([
-      ...users,
-      { email: ADMIN_EMAIL, password: ADMIN_PASSWORD, name: "Administrador", role: "admin" },
-    ]);
-  }
+async function apiFetch(path: string, options?: RequestInit) {
+  const res = await fetch(`${API}${path}`, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+  return res;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -68,7 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    seedAdmin();
     try {
       const session = localStorage.getItem(SESSION_KEY);
       if (session) {
@@ -82,109 +60,115 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const checkEmailExists = (email: string): boolean => {
-    if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return true;
-    const users = getStoredUsers();
-    return users.some((u) => u.email.toLowerCase() === email.toLowerCase());
-  };
-
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    const users = getStoredUsers();
-    const found = users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
-    if (!found) {
-      return { success: false, error: "Correo o contraseña incorrectos." };
+  const checkEmailExists = useCallback(async (email: string): Promise<boolean> => {
+    try {
+      const res = await apiFetch("/auth/check-email", {
+        method: "POST",
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      return !!data.exists;
+    } catch {
+      return false;
     }
-    const sessionUser: User = { email: found.email, name: found.name, role: found.role };
-    setUser(sessionUser);
-    localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
-    return { success: true };
-  };
+  }, []);
 
-  const register = async (
-    email: string,
-    password: string,
-    name: string
-  ): Promise<{ success: boolean; error?: string }> => {
-    if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-      return { success: false, error: "Este correo ya tiene una cuenta." };
+  const login = useCallback(async (email: string, password: string) => {
+    try {
+      const res = await apiFetch("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        return { success: false, error: data.error ?? "Error al iniciar sesión" };
+      }
+      const data = await res.json();
+      const sessionUser: User = data.user;
+      setUser(sessionUser);
+      localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
+      return { success: true };
+    } catch {
+      return { success: false, error: "Error de conexión. Intenta de nuevo." };
     }
-    const users = getStoredUsers();
-    const exists = users.some((u) => u.email.toLowerCase() === email.toLowerCase());
-    if (exists) {
-      return { success: false, error: "Este correo ya tiene una cuenta." };
-    }
-    const newUser: StoredUser = { email, password, name, role: "Account Manager" };
-    saveUsers([...users, newUser]);
-    const sessionUser: User = { email: newUser.email, name: newUser.name, role: newUser.role };
-    setUser(sessionUser);
-    localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
-    return { success: true };
-  };
+  }, []);
 
-  const logout = () => {
+  const register = useCallback(async (email: string, password: string, name: string) => {
+    try {
+      const res = await apiFetch("/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ email, password, name }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        return { success: false, error: data.error ?? "Error al registrarse" };
+      }
+      const data = await res.json();
+      const sessionUser: User = data.user;
+      setUser(sessionUser);
+      localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
+      return { success: true };
+    } catch {
+      return { success: false, error: "Error de conexión. Intenta de nuevo." };
+    }
+  }, []);
+
+  const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem(SESSION_KEY);
-  };
+  }, []);
 
-  const getAllUsers = (): StoredUser[] => {
-    return getStoredUsers().filter((u) => u.role !== "admin");
-  };
-
-  const getTicketPermissions = (): Record<string, boolean> => {
+  const getAllUsers = useCallback(async (): Promise<StoredUser[]> => {
     try {
-      const data = localStorage.getItem(PERMISSIONS_KEY);
-      return data ? JSON.parse(data) : {};
+      const res = await apiFetch("/admin/users");
+      if (!res.ok) return [];
+      return await res.json();
     } catch {
-      return {};
+      return [];
     }
-  };
+  }, []);
 
-  const setTicketPermission = (email: string, allowed: boolean) => {
-    const perms = getTicketPermissions();
-    perms[email.toLowerCase()] = allowed;
-    localStorage.setItem(PERMISSIONS_KEY, JSON.stringify(perms));
-  };
+  const setTicketPermission = useCallback(async (email: string, allowed: boolean) => {
+    await apiFetch(`/admin/users/${encodeURIComponent(email)}/permission`, {
+      method: "POST",
+      body: JSON.stringify({ allowed }),
+    });
+  }, []);
 
-  const hasTicketAccess = (email: string): boolean => {
-    const perms = getTicketPermissions();
-    return !!perms[email.toLowerCase()];
-  };
+  const hasTicketAccess = useCallback(async (email: string): Promise<boolean> => {
+    try {
+      const res = await apiFetch(`/admin/permissions/${encodeURIComponent(email)}`);
+      if (!res.ok) return false;
+      const data = await res.json();
+      return !!data.allowed;
+    } catch {
+      return false;
+    }
+  }, []);
 
-  const deleteUser = (email: string) => {
-    const users = getStoredUsers().filter((u) => u.email.toLowerCase() !== email.toLowerCase());
-    saveUsers(users);
-    const perms = getTicketPermissions();
-    delete perms[email.toLowerCase()];
-    localStorage.setItem(PERMISSIONS_KEY, JSON.stringify(perms));
-  };
+  const deleteUser = useCallback(async (email: string) => {
+    await apiFetch(`/admin/users/${encodeURIComponent(email)}`, { method: "DELETE" });
+  }, []);
 
-  const changeUserPassword = (email: string, newPassword: string) => {
-    const users = getStoredUsers().map((u) =>
-      u.email.toLowerCase() === email.toLowerCase() ? { ...u, password: newPassword } : u
-    );
-    saveUsers(users);
-  };
+  const changeUserPassword = useCallback(async (email: string, newPassword: string) => {
+    await apiFetch(`/admin/users/${encodeURIComponent(email)}/password`, {
+      method: "PUT",
+      body: JSON.stringify({ password: newPassword }),
+    });
+  }, []);
 
-  const approveAll = () => {
-    const users = getStoredUsers().filter((u) => u.role !== "admin");
-    const perms = getTicketPermissions();
-    users.forEach((u) => { perms[u.email.toLowerCase()] = true; });
-    localStorage.setItem(PERMISSIONS_KEY, JSON.stringify(perms));
-  };
+  const approveAll = useCallback(async () => {
+    await apiFetch("/admin/permissions/approve-all", { method: "POST" });
+  }, []);
 
-  const revokeAll = () => {
-    const users = getStoredUsers().filter((u) => u.role !== "admin");
-    const perms = getTicketPermissions();
-    users.forEach((u) => { perms[u.email.toLowerCase()] = false; });
-    localStorage.setItem(PERMISSIONS_KEY, JSON.stringify(perms));
-  };
+  const revokeAll = useCallback(async () => {
+    await apiFetch("/admin/permissions/revoke-all", { method: "POST" });
+  }, []);
 
   return (
     <AuthContext.Provider value={{
       user, loading, login, register, logout, checkEmailExists,
-      getAllUsers, getTicketPermissions, setTicketPermission, hasTicketAccess,
+      getAllUsers, setTicketPermission, hasTicketAccess,
       deleteUser, changeUserPassword, approveAll, revokeAll,
     }}>
       {children}

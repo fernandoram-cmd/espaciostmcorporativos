@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useLocation } from "wouter";
 import { RefreshCw, ArrowLeft, TicketX } from "lucide-react";
 import { useAuth } from "@/context/auth";
@@ -106,6 +106,7 @@ export default function EventosPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [view, setView] = useState<View>("preview");
   const [activeTicket, setActiveTicket] = useState(0);
+  const [ticketAccess, setTicketAccess] = useState<boolean | null>(null);
 
   const handleViewBarcode = useCallback((index: number) => {
     setActiveTicket(index);
@@ -120,6 +121,12 @@ export default function EventosPage() {
   const handleBack = useCallback(() => {
     setView("preview");
   }, []);
+
+  useEffect(() => {
+    if (!loading && user) {
+      hasTicketAccess(user.email).then(setTicketAccess);
+    }
+  }, [loading, user]);
 
   if (loading) return null;
   if (!user) {
@@ -189,7 +196,7 @@ export default function EventosPage() {
               <span className="text-base">Mis anuncios</span>
             </button>
 
-            {hasTicketAccess(user.email) ? (
+            {ticketAccess === null ? null : ticketAccess ? (
               <SwipeCarousel
                 count={TICKETS.length}
                 active={activeTicket}
