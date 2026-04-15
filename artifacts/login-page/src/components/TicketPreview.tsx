@@ -54,33 +54,33 @@ export default function TicketPreview({ ticket, onViewBarcode }: TicketPreviewPr
     <div className="flex flex-col gap-4">
       <div className="rounded-2xl overflow-hidden shadow-md border border-gray-200 bg-white">
         <div
-          className="w-full py-4 px-5 flex items-center justify-center"
+          className="w-full py-3 px-5 flex items-center justify-center"
           style={{ backgroundColor: "#1C6AE4" }}
         >
-          <span className="text-white font-bold text-lg tracking-wide text-center">
+          <span className="text-white font-bold text-base tracking-wide text-center">
             Boleto Espacios Corporativos
           </span>
         </div>
 
         <div
-          className="w-full px-5 pt-5 pb-6"
+          className="w-full px-5 pt-4 pb-5"
           style={{ backgroundColor: "#1C6AE4" }}
         >
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-blue-200 text-[11px] font-semibold uppercase tracking-widest mb-1.5">
+              <p className="text-blue-200 text-[11px] font-semibold uppercase tracking-widest mb-1">
                 Sección
               </p>
               <p className="text-white text-2xl font-black leading-tight">{ticket.seccion}</p>
             </div>
             <div className="text-center">
-              <p className="text-blue-200 text-[11px] font-semibold uppercase tracking-widest mb-1.5">
+              <p className="text-blue-200 text-[11px] font-semibold uppercase tracking-widest mb-1">
                 Fila
               </p>
               <p className="text-white text-2xl font-black leading-tight">{ticket.fila}</p>
             </div>
             <div className="text-right">
-              <p className="text-blue-200 text-[11px] font-semibold uppercase tracking-widest mb-1.5">
+              <p className="text-blue-200 text-[11px] font-semibold uppercase tracking-widest mb-1">
                 Asiento
               </p>
               <p className="text-white text-2xl font-black leading-tight">{ticket.asiento}</p>
