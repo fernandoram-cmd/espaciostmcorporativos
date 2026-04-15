@@ -35,7 +35,7 @@ export default function TerminosPage() {
             <p>
               Los siguientes son los términos de uso (&ldquo;Términos&rdquo;) que rigen su uso del sitio web del Administrador de Cuentas (el &ldquo;Sitio&rdquo;), que ofrece tecnologías y servicios avanzados para la transacción de boletos (denominados colectivamente &ldquo;Servicios Avanzados&rdquo;). Algunos de los Servicios Avanzados son proporcionados por Espacios Corporativos y otros por Ticketmaster (&ldquo;nosotros&rdquo;). Nuestra{" "}
               <a
-                href="https://privacy.ticketmaster.com.mx/es/privacy-policy"
+                href="https://privacy.ticketmaster.com.mx/en/privacy-policy"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-purple-600 underline"

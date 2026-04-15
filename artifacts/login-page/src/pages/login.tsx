@@ -247,7 +247,7 @@ export default function LoginPage() {
                   </Link>{" "}
                   y comprendes que la información se usará como se describe en nuestras{" "}
                   <a
-                    href="https://privacy.ticketmaster.com.mx/es/privacy-policy"
+                    href="https://privacy.ticketmaster.com.mx/en/privacy-policy"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-bold underline text-gray-900"
