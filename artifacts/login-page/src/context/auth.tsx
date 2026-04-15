@@ -12,14 +12,22 @@ interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   checkEmailExists: (email: string) => boolean;
+  getAllUsers: () => StoredUser[];
+  getTicketPermissions: () => Record<string, boolean>;
+  setTicketPermission: (email: string, allowed: boolean) => void;
+  hasTicketAccess: (email: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const USERS_KEY = "ec_users";
 const SESSION_KEY = "ec_session";
+const PERMISSIONS_KEY = "ec_ticket_permissions";
 
-interface StoredUser {
+const ADMIN_EMAIL = "ramirez.ferni1545@gmail.com";
+const ADMIN_PASSWORD = "Liapig1573";
+
+export interface StoredUser {
   email: string;
   password: string;
   name: string;
@@ -39,10 +47,22 @@ function saveUsers(users: StoredUser[]) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
+function seedAdmin() {
+  const users = getStoredUsers();
+  const adminExists = users.some((u) => u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+  if (!adminExists) {
+    saveUsers([
+      ...users,
+      { email: ADMIN_EMAIL, password: ADMIN_PASSWORD, name: "Administrador", role: "admin" },
+    ]);
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    seedAdmin();
     try {
       const session = localStorage.getItem(SESSION_KEY);
       if (session) {
@@ -55,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const checkEmailExists = (email: string): boolean => {
+    if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return true;
     const users = getStoredUsers();
     return users.some((u) => u.email.toLowerCase() === email.toLowerCase());
   };
@@ -78,6 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string,
     name: string
   ): Promise<{ success: boolean; error?: string }> => {
+    if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+      return { success: false, error: "Este correo ya tiene una cuenta." };
+    }
     const users = getStoredUsers();
     const exists = users.some((u) => u.email.toLowerCase() === email.toLowerCase());
     if (exists) {
@@ -96,8 +120,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(SESSION_KEY);
   };
 
+  const getAllUsers = (): StoredUser[] => {
+    return getStoredUsers().filter((u) => u.role !== "admin");
+  };
+
+  const getTicketPermissions = (): Record<string, boolean> => {
+    try {
+      const data = localStorage.getItem(PERMISSIONS_KEY);
+      return data ? JSON.parse(data) : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const setTicketPermission = (email: string, allowed: boolean) => {
+    const perms = getTicketPermissions();
+    perms[email.toLowerCase()] = allowed;
+    localStorage.setItem(PERMISSIONS_KEY, JSON.stringify(perms));
+  };
+
+  const hasTicketAccess = (email: string): boolean => {
+    const perms = getTicketPermissions();
+    return !!perms[email.toLowerCase()];
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, checkEmailExists }}>
+    <AuthContext.Provider value={{
+      user, login, register, logout, checkEmailExists,
+      getAllUsers, getTicketPermissions, setTicketPermission, hasTicketAccess,
+    }}>
       {children}
     </AuthContext.Provider>
   );

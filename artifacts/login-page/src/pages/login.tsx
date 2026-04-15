@@ -114,6 +114,14 @@ export default function LoginPage() {
     const result = await login(email, password);
     setLoading(false);
     if (result.success) {
+      try {
+        const session = localStorage.getItem("ec_session");
+        const parsed = session ? JSON.parse(session) : null;
+        if (parsed?.role === "admin") {
+          setLocation("/admin");
+          return;
+        }
+      } catch {}
       setLocation("/eventos");
     } else {
       setError(result.error ?? "Error al iniciar sesión.");

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { RefreshCw, ArrowLeft } from "lucide-react";
+import { RefreshCw, ArrowLeft, TicketX } from "lucide-react";
 import { useAuth } from "@/context/auth";
 import AppHeader from "@/components/AppHeader";
 import MenuDrawer from "@/components/MenuDrawer";
@@ -10,7 +10,7 @@ import TicketPreview from "@/components/TicketPreview";
 type View = "preview" | "barcode";
 
 export default function EventosPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, hasTicketAccess } = useAuth();
   const [, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [view, setView] = useState<View>("preview");
@@ -74,7 +74,19 @@ export default function EventosPage() {
               <span className="text-base">Mis anuncios</span>
             </button>
 
-            <TicketPreview onViewBarcode={() => setView("barcode")} />
+            {hasTicketAccess(user.email) ? (
+              <TicketPreview onViewBarcode={() => setView("barcode")} />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+                <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-5">
+                  <TicketX size={30} className="text-gray-400" />
+                </div>
+                <p className="text-lg font-bold text-gray-800 mb-2">Sin boletos asignados</p>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Aún no tienes boletos disponibles. Contacta al administrador para que te asigne acceso.
+                </p>
+              </div>
+            )}
           </>
         )}
       </main>

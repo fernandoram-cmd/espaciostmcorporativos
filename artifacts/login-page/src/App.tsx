@@ -12,6 +12,7 @@ import PerfilPage from "@/pages/perfil";
 import ActividadPage from "@/pages/actividad";
 import CarritoPage from "@/pages/carrito";
 import TerminosPage from "@/pages/terminos";
+import AdminPage from "@/pages/admin";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/actividad" component={ActividadPage} />
       <Route path="/carrito" component={CarritoPage} />
       <Route path="/terminos" component={TerminosPage} />
+      <Route path="/admin" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
   );
