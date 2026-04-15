@@ -85,13 +85,16 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
             {espaciosOpen && (
               <ul className="bg-black">
                 <li>
-                  <button
+                  <a
+                    href="https://www.estadiognpseguros.com/gnp-premium-pass"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="block w-full text-left py-4 pl-4 text-lg text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
                     data-testid="menu-item-gnp-premium"
-                    onClick={() => navigate("/gnp-premium")}
+                    onClick={onClose}
                   >
                     GNP Premium Pass
-                  </button>
+                  </a>
                 </li>
                 <li>
                   <a
