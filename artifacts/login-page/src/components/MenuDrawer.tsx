@@ -40,12 +40,11 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
         </button>
 
         <div className="absolute left-1/2 -translate-x-1/2">
-          <span
-            className="font-black text-xl uppercase select-none text-white"
-            style={{ fontFamily: "'Arial Black', 'Impact', sans-serif", letterSpacing: "0.14em" }}
-          >
-            OCESA
-          </span>
+          <img
+            src={`${import.meta.env.BASE_URL}ocesa-logo.jpeg`}
+            alt="OCESA"
+            className="h-8 w-auto object-contain select-none"
+          />
         </div>
 
         <div className="flex items-center gap-4">
