@@ -105,13 +105,16 @@ export default function MenuDrawer({ open, onClose, userInitial, userName, onLog
                   </a>
                 </li>
                 <li>
-                  <button
+                  <a
+                    href="https://www.estadiognpseguros.com/boxes"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="block w-full text-left py-4 pl-4 text-lg text-white border-b border-gray-800 hover:text-gray-300 transition-colors"
                     data-testid="menu-item-boxes"
-                    onClick={() => navigate("/boxes")}
+                    onClick={onClose}
                   >
                     Boxes
-                  </button>
+                  </a>
                 </li>
               </ul>
             )}
