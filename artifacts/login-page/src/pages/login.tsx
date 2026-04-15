@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, Link } from "wouter";
-import { KeyRound, ArrowLeft, X, UserRound } from "lucide-react";
+import { KeyRound, ArrowLeft, X, UserRound, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/auth";
 
 type Step = "email" | "password" | "register";
@@ -92,6 +92,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPasskeyModal, setShowPasskeyModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [passkeyLoading, setPasskeyLoading] = useState(false);
   const { login, register, checkEmailExists } = useAuth();
   const [, setLocation] = useLocation();
@@ -297,15 +298,34 @@ export default function LoginPage() {
                 <label htmlFor="password" className="block text-sm text-gray-600 mb-1">
                   Contraseña
                 </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  data-testid="input-password"
-                  autoFocus
-                  className="w-full border border-gray-300 rounded px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-gray-400 mb-4 bg-white"
-                />
+                <div className="relative mb-2">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    data-testid="input-password"
+                    autoFocus
+                    className="w-full border border-gray-300 rounded px-3 py-3 pr-11 text-base focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    tabIndex={-1}
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showPassword ? <EyeOff size={20} strokeWidth={1.5} /> : <Eye size={20} strokeWidth={1.5} />}
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  className="text-sm text-black underline underline-offset-2 mb-4 text-left"
+                  data-testid="button-forgot-password"
+                >
+                  Olvidé mi contraseña
+                </button>
 
                 {error && (
                   <p className="text-red-600 text-sm mb-3">{error}</p>
