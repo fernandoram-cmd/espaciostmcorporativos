@@ -110,7 +110,7 @@ function DeleteConfirm({ user, onConfirm, onClose }: DeleteConfirmProps) {
 
 export default function AdminPage() {
   const {
-    user, logout, getAllUsers, getTicketPermissions,
+    user, loading, logout, getAllUsers, getTicketPermissions,
     setTicketPermission, deleteUser, changeUserPassword, approveAll, revokeAll,
   } = useAuth();
   const [, setLocation] = useLocation();
@@ -129,9 +129,10 @@ export default function AdminPage() {
   }, [getAllUsers, getTicketPermissions]);
 
   useEffect(() => {
+    if (loading) return;
     if (!user || user.role !== "admin") { setLocation("/"); return; }
     refresh();
-  }, [user]);
+  }, [user, loading]);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -173,7 +174,7 @@ export default function AdminPage() {
 
   const handleLogout = () => { logout(); setLocation("/"); };
 
-  if (!user || user.role !== "admin") return null;
+  if (loading || !user || user.role !== "admin") return null;
 
   const approvedCount = allUsers.filter((u) => !!permissions[u.email.toLowerCase()]).length;
   const noAccessCount = allUsers.length - approvedCount;

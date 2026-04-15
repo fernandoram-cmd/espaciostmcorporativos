@@ -5,10 +5,11 @@ import AppHeader from "@/components/AppHeader";
 import MenuDrawer from "@/components/MenuDrawer";
 
 export default function BoxesPage() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  if (loading) return null;
   if (!user) {
     setLocation("/");
     return null;

@@ -19,10 +19,11 @@ function EmptyCartIcon() {
 }
 
 export default function CarritoPage() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  if (loading) return null;
   if (!user) {
     setLocation("/");
     return null;

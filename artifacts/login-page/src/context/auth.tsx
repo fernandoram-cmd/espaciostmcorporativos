@@ -8,6 +8,7 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
+  loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
@@ -64,6 +65,7 @@ function seedAdmin() {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     seedAdmin();
@@ -75,6 +77,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch {
       localStorage.removeItem(SESSION_KEY);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -179,7 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{
-      user, login, register, logout, checkEmailExists,
+      user, loading, login, register, logout, checkEmailExists,
       getAllUsers, getTicketPermissions, setTicketPermission, hasTicketAccess,
       deleteUser, changeUserPassword, approveAll, revokeAll,
     }}>

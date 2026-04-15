@@ -7,17 +7,17 @@ import stadiumConcert from "@/assets/stadium-concert.png";
 import domeArena from "@/assets/dome-arena.png";
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       setLocation("/");
     }
-  }, [user, setLocation]);
+  }, [user, loading, setLocation]);
 
-  if (!user) return null;
+  if (loading || !user) return null;
 
   const firstName = user.name.split(" ")[0];
   const initial = firstName.charAt(0).toUpperCase();

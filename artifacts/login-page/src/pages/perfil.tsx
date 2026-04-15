@@ -6,10 +6,11 @@ import MenuDrawer from "@/components/MenuDrawer";
 import { User, Mail, Phone, MapPin } from "lucide-react";
 
 export default function PerfilPage() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  if (loading) return null;
   if (!user) {
     setLocation("/");
     return null;

@@ -101,12 +101,13 @@ function SwipeCarousel({ count, active, onChange, children }: SwipeCarouselProps
 }
 
 export default function EventosPage() {
-  const { user, logout, hasTicketAccess } = useAuth();
+  const { user, loading, logout, hasTicketAccess } = useAuth();
   const [, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [view, setView] = useState<View>("preview");
   const [activeTicket, setActiveTicket] = useState(0);
 
+  if (loading) return null;
   if (!user) {
     setLocation("/");
     return null;

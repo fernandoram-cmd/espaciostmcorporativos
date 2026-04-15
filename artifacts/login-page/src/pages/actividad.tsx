@@ -6,13 +6,14 @@ import MenuDrawer from "@/components/MenuDrawer";
 import { Search, ChevronDown } from "lucide-react";
 
 export default function ActividadPage() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFilter, setDateFilter] = useState("Todas las fechas");
   const [sortOpen, setSortOpen] = useState(false);
 
+  if (loading) return null;
   if (!user) {
     setLocation("/");
     return null;
