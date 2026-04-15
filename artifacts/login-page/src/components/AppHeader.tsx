@@ -2,14 +2,21 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { ShoppingCart } from "lucide-react";
 
+export interface TicketMenuProps {
+  onTransfer: () => void;
+  onAddToWallet: () => void;
+  walletAdded: boolean;
+}
+
 interface AppHeaderProps {
   userInitial: string;
   userName: string;
   onMenuOpen: () => void;
   onLogout: () => void;
+  ticketMenu?: TicketMenuProps;
 }
 
-export default function AppHeader({ userInitial, userName, onMenuOpen, onLogout }: AppHeaderProps) {
+export default function AppHeader({ userInitial, userName, onMenuOpen, onLogout, ticketMenu }: AppHeaderProps) {
   const [, setLocation] = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -68,7 +75,29 @@ export default function AppHeader({ userInitial, userName, onMenuOpen, onLogout 
             {userInitial}
           </button>
 
-          {dropdownOpen && (
+          {dropdownOpen && ticketMenu ? (
+            <div className="absolute right-0 top-12 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-fade-in">
+              <div className="w-full px-6 py-4 bg-black text-white font-bold text-base">
+                Gestionar los boletos
+              </div>
+              <button
+                onClick={() => { setDropdownOpen(false); ticketMenu.onTransfer(); }}
+                className="w-full text-left px-6 py-4 text-base text-black hover:bg-gray-50 transition-colors border-b border-gray-100"
+                data-testid="dropdown-transferir"
+              >
+                Transferir Boletos
+              </button>
+              {!ticketMenu.walletAdded && (
+                <button
+                  onClick={() => { setDropdownOpen(false); ticketMenu.onAddToWallet(); }}
+                  className="w-full text-left px-6 py-4 text-base text-black hover:bg-gray-50 transition-colors"
+                  data-testid="dropdown-agregar-cartera"
+                >
+                  Agregar boletos a la cartera
+                </button>
+              )}
+            </div>
+          ) : dropdownOpen ? (
             <div className="absolute right-0 top-12 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-fade-in">
               <button
                 onClick={() => navigate("/perfil")}
@@ -92,7 +121,7 @@ export default function AppHeader({ userInitial, userName, onMenuOpen, onLogout 
                 Desconectar
               </button>
             </div>
-          )}
+          ) : null}
         </div>
 
         <button

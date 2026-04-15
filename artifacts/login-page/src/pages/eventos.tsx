@@ -7,6 +7,8 @@ import MenuDrawer from "@/components/MenuDrawer";
 import DigitalTicket from "@/components/DigitalTicket";
 import TicketPreview, { type TicketData } from "@/components/TicketPreview";
 
+const WALLET_MENU_KEY = "ec_wallet_menu_added";
+
 type View = "preview" | "barcode";
 
 const TICKETS: TicketData[] = [
@@ -107,6 +109,9 @@ export default function EventosPage() {
   const [view, setView] = useState<View>("preview");
   const [activeTicket, setActiveTicket] = useState(0);
   const [ticketAccess, setTicketAccess] = useState<boolean | null>(null);
+  const [walletAdded, setWalletAdded] = useState(() => {
+    try { return localStorage.getItem(WALLET_MENU_KEY) === "1"; } catch { return false; }
+  });
 
   const handleViewBarcode = useCallback((index: number) => {
     setActiveTicket(index);
@@ -122,17 +127,35 @@ export default function EventosPage() {
     setView("preview");
   }, []);
 
+  const handleTransfer = useCallback(() => {
+  }, []);
+
+  const handleAddToWallet = useCallback(() => {
+    TICKETS.forEach((ticket) => {
+      const link = document.createElement("a");
+      link.href = `${import.meta.env.BASE_URL}${ticket.pkpassFile}`;
+      link.download = ticket.pkpassFile;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+    try { localStorage.setItem(WALLET_MENU_KEY, "1"); } catch {}
+    setWalletAdded(true);
+  }, []);
+
   useEffect(() => {
     if (!loading && user) {
       hasTicketAccess(user.email).then(setTicketAccess);
     }
   }, [loading, user]);
 
-  if (loading) return null;
-  if (!user) {
-    setLocation("/");
-    return null;
-  }
+  useEffect(() => {
+    if (!loading && !user) {
+      setLocation("/");
+    }
+  }, [loading, user, setLocation]);
+
+  if (loading || !user) return null;
 
   const firstName = user.name.split(" ")[0];
   const initial = firstName.charAt(0).toUpperCase();
@@ -144,6 +167,11 @@ export default function EventosPage() {
         userName={firstName}
         onMenuOpen={() => setMenuOpen(true)}
         onLogout={handleLogout}
+        ticketMenu={{
+          onTransfer: handleTransfer,
+          onAddToWallet: handleAddToWallet,
+          walletAdded,
+        }}
       />
 
       <MenuDrawer
@@ -215,9 +243,8 @@ export default function EventosPage() {
                 <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-5">
                   <TicketX size={30} className="text-gray-400" />
                 </div>
-                <p className="text-lg font-bold text-gray-800 mb-2">Sin boletos asignados</p>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  Aún no tienes boletos disponibles. Contacta al administrador para que te asigne acceso.
+                <p className="text-base text-gray-700 leading-relaxed">
+                  No tienes entradas para ningún evento próximo.
                 </p>
               </div>
             )}
