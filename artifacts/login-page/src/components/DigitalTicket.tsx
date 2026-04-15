@@ -1,24 +1,25 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useAuth } from "@/context/auth";
+import type { TicketData } from "@/components/TicketPreview";
 
 const DOWNLOADS_KEY = "ec_pass_downloads";
 const BARCODE_INTERVAL_MS = 10000;
 
-function hasDownloaded(email: string): boolean {
+function hasDownloaded(key: string): boolean {
   try {
     const data = localStorage.getItem(DOWNLOADS_KEY);
     const map: Record<string, boolean> = data ? JSON.parse(data) : {};
-    return !!map[email.toLowerCase()];
+    return !!map[key];
   } catch {
     return false;
   }
 }
 
-function markDownloaded(email: string) {
+function markDownloaded(key: string) {
   try {
     const data = localStorage.getItem(DOWNLOADS_KEY);
     const map: Record<string, boolean> = data ? JSON.parse(data) : {};
-    map[email.toLowerCase()] = true;
+    map[key] = true;
     localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(map));
   } catch {}
 }
@@ -107,21 +108,25 @@ function SafetixBarcode({ code }: { code: string }) {
   );
 }
 
-const pkpassUrl = `${import.meta.env.BASE_URL}pase-evento.pkpass`;
+interface DigitalTicketProps {
+  userName: string;
+  ticket: TicketData;
+}
 
-export default function DigitalTicket({ userName }: { userName: string }) {
+export default function DigitalTicket({ userName, ticket }: DigitalTicketProps) {
   const { user } = useAuth();
-  const [downloaded, setDownloaded] = useState(false);
+  const dlKey = `${user?.email?.toLowerCase() ?? "guest"}_${ticket.index}`;
+  const pkpassUrl = `${import.meta.env.BASE_URL}${ticket.pkpassFile}`;
+
+  const [downloaded, setDownloaded] = useState(() => hasDownloaded(dlKey));
   const [showInfo, setShowInfo] = useState(false);
   const [barcodeCode, setBarcodeCode] = useState(() => generateCode());
   const [barcodeFlash, setBarcodeFlash] = useState(false);
   const infoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (user?.email) {
-      setDownloaded(hasDownloaded(user.email));
-    }
-  }, [user?.email]);
+    setDownloaded(hasDownloaded(dlKey));
+  }, [dlKey]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -135,10 +140,10 @@ export default function DigitalTicket({ userName }: { userName: string }) {
   }, []);
 
   const handleDownload = useCallback(() => {
-    if (!user?.email || downloaded) return;
-    markDownloaded(user.email);
+    if (downloaded) return;
+    markDownloaded(dlKey);
     setDownloaded(true);
-  }, [user?.email, downloaded]);
+  }, [dlKey, downloaded]);
 
   const handleInfo = useCallback(() => {
     setShowInfo(true);
@@ -177,7 +182,7 @@ export default function DigitalTicket({ userName }: { userName: string }) {
         </p>
 
         <div className="relative flex items-center justify-center mb-7 mt-4">
-          <h2 className="text-xl font-bold text-gray-900 text-center">Boxes Oro</h2>
+          <h2 className="text-xl font-bold text-gray-900 text-center">{ticket.seccion}</h2>
           <div className="absolute right-0">
             <button
               onClick={handleInfo}
@@ -200,19 +205,19 @@ export default function DigitalTicket({ userName }: { userName: string }) {
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
               Sección
             </p>
-            <p className="text-2xl font-black text-gray-900 leading-none">Box Oro</p>
+            <p className="text-2xl font-black text-gray-900 leading-none">{ticket.seccion}</p>
           </div>
           <div className="text-center">
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
               Fila
             </p>
-            <p className="text-2xl font-black text-gray-900 leading-none">6</p>
+            <p className="text-2xl font-black text-gray-900 leading-none">{ticket.fila}</p>
           </div>
           <div className="text-right">
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
               Asiento(s)
             </p>
-            <p className="text-2xl font-black text-gray-900 leading-none">4</p>
+            <p className="text-2xl font-black text-gray-900 leading-none">{ticket.asiento}</p>
           </div>
         </div>
 
@@ -246,7 +251,7 @@ export default function DigitalTicket({ userName }: { userName: string }) {
         ) : (
           <a
             href={pkpassUrl}
-            download="pase-evento.pkpass"
+            download={ticket.pkpassFile}
             onClick={handleDownload}
             className="flex items-center justify-center w-full bg-black text-white py-3 px-5 rounded-xl hover:bg-gray-900 transition-colors"
             data-testid="button-wallet"

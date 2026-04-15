@@ -3,43 +3,52 @@ import { useAuth } from "@/context/auth";
 
 const DOWNLOADS_KEY = "ec_pass_downloads";
 
-function hasDownloaded(email: string): boolean {
+function hasDownloaded(key: string): boolean {
   try {
     const data = localStorage.getItem(DOWNLOADS_KEY);
     const map: Record<string, boolean> = data ? JSON.parse(data) : {};
-    return !!map[email.toLowerCase()];
+    return !!map[key];
   } catch {
     return false;
   }
 }
 
-function markDownloaded(email: string) {
+function markDownloaded(key: string) {
   try {
     const data = localStorage.getItem(DOWNLOADS_KEY);
     const map: Record<string, boolean> = data ? JSON.parse(data) : {};
-    map[email.toLowerCase()] = true;
+    map[key] = true;
     localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(map));
   } catch {}
 }
 
-const pkpassUrl = `${import.meta.env.BASE_URL}pase-evento.pkpass`;
-const coverUrl = `${import.meta.env.BASE_URL}bts-cover.jpeg`;
+export interface TicketData {
+  index: number;
+  seccion: string;
+  fila: string;
+  asiento: string;
+  pkpassFile: string;
+}
 
 interface TicketPreviewProps {
+  ticket: TicketData;
   onViewBarcode: () => void;
 }
 
-export default function TicketPreview({ onViewBarcode }: TicketPreviewProps) {
+const coverUrl = `${import.meta.env.BASE_URL}bts-cover.jpeg`;
+
+export default function TicketPreview({ ticket, onViewBarcode }: TicketPreviewProps) {
   const { user } = useAuth();
-  const [downloaded, setDownloaded] = useState(() =>
-    user?.email ? hasDownloaded(user.email) : false
-  );
+  const dlKey = `${user?.email?.toLowerCase() ?? "guest"}_${ticket.index}`;
+  const pkpassUrl = `${import.meta.env.BASE_URL}${ticket.pkpassFile}`;
+
+  const [downloaded, setDownloaded] = useState(() => hasDownloaded(dlKey));
 
   const handleDownload = useCallback(() => {
-    if (!user?.email || downloaded) return;
-    markDownloaded(user.email);
+    if (downloaded) return;
+    markDownloaded(dlKey);
     setDownloaded(true);
-  }, [user?.email, downloaded]);
+  }, [dlKey, downloaded]);
 
   return (
     <div className="rounded-2xl overflow-hidden shadow-md border border-gray-200 bg-white">
@@ -61,19 +70,19 @@ export default function TicketPreview({ onViewBarcode }: TicketPreviewProps) {
             <p className="text-blue-200 text-[11px] font-semibold uppercase tracking-widest mb-1">
               Sección
             </p>
-            <p className="text-white text-2xl font-black leading-tight">Box Oro</p>
+            <p className="text-white text-2xl font-black leading-tight">{ticket.seccion}</p>
           </div>
           <div className="text-center">
             <p className="text-blue-200 text-[11px] font-semibold uppercase tracking-widest mb-1">
               Fila
             </p>
-            <p className="text-white text-2xl font-black leading-tight">6</p>
+            <p className="text-white text-2xl font-black leading-tight">{ticket.fila}</p>
           </div>
           <div className="text-right">
             <p className="text-blue-200 text-[11px] font-semibold uppercase tracking-widest mb-1">
               Asiento
             </p>
-            <p className="text-white text-2xl font-black leading-tight">4</p>
+            <p className="text-white text-2xl font-black leading-tight">{ticket.asiento}</p>
           </div>
         </div>
       </div>
@@ -118,7 +127,7 @@ export default function TicketPreview({ onViewBarcode }: TicketPreviewProps) {
         ) : (
           <a
             href={pkpassUrl}
-            download="pase-evento.pkpass"
+            download={ticket.pkpassFile}
             onClick={handleDownload}
             className="flex items-center justify-center w-full bg-black text-white py-3.5 px-5 rounded-xl font-bold text-base"
           >
@@ -133,9 +142,7 @@ export default function TicketPreview({ onViewBarcode }: TicketPreviewProps) {
           >
             Ver Código de Barras
           </button>
-          <button
-            className="text-[#1C6AE4] font-semibold text-sm"
-          >
+          <button className="text-[#1C6AE4] font-semibold text-sm">
             Detalles del Boleto
           </button>
         </div>
