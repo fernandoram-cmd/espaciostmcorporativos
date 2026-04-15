@@ -107,6 +107,20 @@ export default function EventosPage() {
   const [view, setView] = useState<View>("preview");
   const [activeTicket, setActiveTicket] = useState(0);
 
+  const handleViewBarcode = useCallback((index: number) => {
+    setActiveTicket(index);
+    setView("barcode");
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    logout();
+    setLocation("/");
+  }, [logout, setLocation]);
+
+  const handleBack = useCallback(() => {
+    setView("preview");
+  }, []);
+
   if (loading) return null;
   if (!user) {
     setLocation("/");
@@ -115,20 +129,6 @@ export default function EventosPage() {
 
   const firstName = user.name.split(" ")[0];
   const initial = firstName.charAt(0).toUpperCase();
-
-  const handleLogout = () => {
-    logout();
-    setLocation("/");
-  };
-
-  const handleViewBarcode = useCallback((index: number) => {
-    setActiveTicket(index);
-    setView("barcode");
-  }, []);
-
-  const handleBack = () => {
-    setView("preview");
-  };
 
   return (
     <div className="min-h-screen bg-white">
