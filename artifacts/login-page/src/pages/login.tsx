@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { KeyRound, ArrowLeft, X, UserRound } from "lucide-react";
 import { useAuth } from "@/context/auth";
 
@@ -238,11 +238,21 @@ export default function LoginPage() {
               <div className="text-xs text-gray-600 leading-relaxed space-y-3">
                 <p>
                   Al continuar con la siguiente página, aceptas los{" "}
-                  <a href="#" className="font-bold underline text-gray-900" data-testid="link-terminos">
+                  <Link
+                    href="/terminos"
+                    className="font-bold underline text-gray-900"
+                    data-testid="link-terminos"
+                  >
                     términos
-                  </a>{" "}
+                  </Link>{" "}
                   y comprendes que la información se usará como se describe en nuestras{" "}
-                  <a href="#" className="font-bold underline text-gray-900" data-testid="link-privacidad">
+                  <a
+                    href="https://privacy.ticketmaster.com.mx/es/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold underline text-gray-900"
+                    data-testid="link-privacidad"
+                  >
                     Política de Privacidad
                   </a>
                 </p>

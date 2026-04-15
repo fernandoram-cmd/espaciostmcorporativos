@@ -11,6 +11,7 @@ import BoxesPage from "@/pages/boxes";
 import PerfilPage from "@/pages/perfil";
 import ActividadPage from "@/pages/actividad";
 import CarritoPage from "@/pages/carrito";
+import TerminosPage from "@/pages/terminos";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/perfil" component={PerfilPage} />
       <Route path="/actividad" component={ActividadPage} />
       <Route path="/carrito" component={CarritoPage} />
+      <Route path="/terminos" component={TerminosPage} />
       <Route component={NotFound} />
     </Switch>
   );
