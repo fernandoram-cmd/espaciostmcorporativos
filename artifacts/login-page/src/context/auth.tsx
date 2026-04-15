@@ -47,17 +47,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const session = localStorage.getItem(SESSION_KEY);
-      if (session) {
-        const parsed = JSON.parse(session);
-        setUser(parsed);
+    const minDelay = new Promise<void>((resolve) => setTimeout(resolve, 1200));
+    const init = async () => {
+      try {
+        const session = localStorage.getItem(SESSION_KEY);
+        if (session) {
+          const parsed = JSON.parse(session);
+          setUser(parsed);
+        }
+      } catch {
+        localStorage.removeItem(SESSION_KEY);
       }
-    } catch {
-      localStorage.removeItem(SESSION_KEY);
-    } finally {
+      await minDelay;
       setLoading(false);
-    }
+    };
+    init();
   }, []);
 
   const checkEmailExists = useCallback(async (email: string): Promise<boolean> => {
