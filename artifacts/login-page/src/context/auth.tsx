@@ -16,6 +16,10 @@ interface AuthContextType {
   getTicketPermissions: () => Record<string, boolean>;
   setTicketPermission: (email: string, allowed: boolean) => void;
   hasTicketAccess: (email: string) => boolean;
+  deleteUser: (email: string) => void;
+  changeUserPassword: (email: string, newPassword: string) => void;
+  approveAll: () => void;
+  revokeAll: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -144,10 +148,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return !!perms[email.toLowerCase()];
   };
 
+  const deleteUser = (email: string) => {
+    const users = getStoredUsers().filter((u) => u.email.toLowerCase() !== email.toLowerCase());
+    saveUsers(users);
+    const perms = getTicketPermissions();
+    delete perms[email.toLowerCase()];
+    localStorage.setItem(PERMISSIONS_KEY, JSON.stringify(perms));
+  };
+
+  const changeUserPassword = (email: string, newPassword: string) => {
+    const users = getStoredUsers().map((u) =>
+      u.email.toLowerCase() === email.toLowerCase() ? { ...u, password: newPassword } : u
+    );
+    saveUsers(users);
+  };
+
+  const approveAll = () => {
+    const users = getStoredUsers().filter((u) => u.role !== "admin");
+    const perms = getTicketPermissions();
+    users.forEach((u) => { perms[u.email.toLowerCase()] = true; });
+    localStorage.setItem(PERMISSIONS_KEY, JSON.stringify(perms));
+  };
+
+  const revokeAll = () => {
+    const users = getStoredUsers().filter((u) => u.role !== "admin");
+    const perms = getTicketPermissions();
+    users.forEach((u) => { perms[u.email.toLowerCase()] = false; });
+    localStorage.setItem(PERMISSIONS_KEY, JSON.stringify(perms));
+  };
+
   return (
     <AuthContext.Provider value={{
       user, login, register, logout, checkEmailExists,
       getAllUsers, getTicketPermissions, setTicketPermission, hasTicketAccess,
+      deleteUser, changeUserPassword, approveAll, revokeAll,
     }}>
       {children}
     </AuthContext.Provider>
