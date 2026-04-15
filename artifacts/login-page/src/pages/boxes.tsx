@@ -86,16 +86,10 @@ export default function BoxesPage() {
 
         <div className="space-y-4">
           <img
-            src={`${BASE}boxes-hero.png`}
-            alt="Boxes Diamante vista"
-            className="w-full rounded-lg object-cover"
-            style={{ maxHeight: 260 }}
-          />
-          <img
             src={`${BASE}suites-interior.png`}
             alt="Box interior"
             className="w-full rounded-lg object-cover"
-            style={{ maxHeight: 260 }}
+            style={{ maxHeight: 280 }}
           />
         </div>
       </div>

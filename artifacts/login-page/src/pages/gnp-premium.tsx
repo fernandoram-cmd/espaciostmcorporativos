@@ -97,13 +97,7 @@ export default function GnpPremiumPage() {
             src={`${BASE}suites-interior.png`}
             alt="Suite interior lounge"
             className="w-full rounded-lg object-cover"
-            style={{ maxHeight: 260 }}
-          />
-          <img
-            src={`${BASE}gnp-hero.jpeg`}
-            alt="GNP Premium Pass entrada"
-            className="w-full rounded-lg object-cover"
-            style={{ maxHeight: 260 }}
+            style={{ maxHeight: 280 }}
           />
         </div>
       </div>
