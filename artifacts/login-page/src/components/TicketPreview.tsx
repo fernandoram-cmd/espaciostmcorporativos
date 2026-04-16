@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { ScanBarcode } from "lucide-react";
 import { useAuth } from "@/context/auth";
 
 const DOWNLOADS_KEY = "ec_pass_downloads";
@@ -136,15 +137,18 @@ export default function TicketPreview({ ticket, onViewBarcode }: TicketPreviewPr
             </a>
           )}
 
-          <div className="flex justify-center items-center gap-8 mt-5 mb-2">
-            <button
-              onClick={onViewBarcode}
-              className="text-[#1C6AE4] font-semibold text-sm"
-            >
-              Ver Código de Barras
-            </button>
-            <button className="text-[#1C6AE4] font-semibold text-sm">
-              Detalles del Boleto
+          <button
+            onClick={onViewBarcode}
+            className="flex items-center justify-center gap-2.5 w-full bg-[#1C3FAA] text-white py-3.5 px-5 rounded-xl font-bold text-base mt-3"
+            data-testid="button-ver-entradas"
+          >
+            <ScanBarcode size={22} strokeWidth={1.8} />
+            Ver entradas
+          </button>
+
+          <div className="flex justify-center mt-4 mb-2">
+            <button className="text-[#1C6AE4] font-semibold text-base">
+              Detalles del boleto
             </button>
           </div>
         </div>
