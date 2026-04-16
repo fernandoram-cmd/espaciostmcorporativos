@@ -12,8 +12,8 @@ const WALLET_MENU_KEY = "ec_wallet_menu_added";
 type View = "preview" | "barcode";
 
 const TICKETS: TicketData[] = [
-  { index: 0, seccion: "Box Oro", fila: "6", asiento: "4", pkpassFile: "pase-evento.pkpass" },
-  { index: 1, seccion: "Box Oro", fila: "6", asiento: "5", pkpassFile: "pase-evento-2.pkpass" },
+  { index: 0, seccion: "Oro121", fila: "6", asiento: "4", pkpassFile: "pase-evento.pkpass" },
+  { index: 1, seccion: "Oro121", fila: "6", asiento: "5", pkpassFile: "pase-evento-2.pkpass" },
 ];
 
 function DotsIndicator({ count, active }: { count: number; active: number }) {
